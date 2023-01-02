@@ -119,13 +119,25 @@ public class Game2D implements Game{
     }
 
     @Override
+    public void keyTypedReaction(KeyEvent keyEvent) {
+
+    }
+
+    @Override
     public void keyPressedReaction(KeyEvent keyEvent) {
-        switch (keyEvent.getKeyCode()){
+        System.out.println(keyEvent.getKeyChar());
+        System.out.println(keyEvent.isConsumed());
+        /*switch (keyEvent.getKeyCode()){
             case VK_RIGHT -> player().velocity().add(new Vertex(1,0));
             case VK_LEFT  -> player().velocity().add(new Vertex(-1,0));
             case VK_DOWN  -> player().velocity().add(new Vertex(0,1));
             case VK_UP    -> player().velocity().add(new Vertex(0,-1));
-        }
+        }*/
+    }
+
+    @Override
+    public void keyReleasedReaction(KeyEvent keyEvent) {
+
     }
 
     @Override

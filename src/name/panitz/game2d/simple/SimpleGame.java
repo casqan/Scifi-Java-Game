@@ -90,7 +90,17 @@ record SimpleGame
     }
   }
 
-	@Override
+  @Override
+  public void keyReleasedReaction(KeyEvent keyEvent) {
+
+  }
+
+  @Override
+  public void keyTypedReaction(KeyEvent keyEvent) {
+
+  }
+
+  @Override
 	public boolean won() {
 		return false;
 	}

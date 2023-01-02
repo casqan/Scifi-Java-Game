@@ -21,7 +21,17 @@ public class SwingScreen extends JPanel{
       t.start();
 
 		
-    addKeyListener(new KeyAdapter() {	
+    addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            logic.keyReleasedReaction(e);
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+            logic.keyTypedReaction(e);
+        }
+
         @Override public void keyPressed(KeyEvent e) {
           logic.keyPressedReaction(e);
         }

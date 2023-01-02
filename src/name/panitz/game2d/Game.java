@@ -19,7 +19,8 @@ public interface Game{
   void doChecks();
 
   void keyPressedReaction(KeyEvent keyEvent);
-
+  void keyReleasedReaction(KeyEvent keyEvent);
+  void keyTypedReaction(KeyEvent keyEvent);
 
   default void move(){
     if (ended()) return;

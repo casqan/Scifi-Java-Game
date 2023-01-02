@@ -37,6 +37,16 @@ record Corona(GameObj player, List<List<? extends GameObj>> goss, int width, int
 		}
 	}
 
+	@Override
+	public void keyReleasedReaction(KeyEvent keyEvent) {
+
+	}
+
+	@Override
+	public void keyTypedReaction(KeyEvent keyEvent) {
+
+	}
+
 	public void doChecks() {
 		for (var m1 : personen()) {
 
