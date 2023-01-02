@@ -1,0 +1,30 @@
+package net.casqan.scifigame.extensions;
+
+import name.panitz.game2d.Vertex;
+
+public class VertexInt {
+    public int x;
+    public int y;
+
+    public VertexInt(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void add(Vertex that) {
+        x += that.x;
+        y += that.y;
+    }
+
+    public void moveTo(VertexInt that) {
+        x = that.x;
+        y = that.y;
+    }
+
+    public Vertex mult(double d) {
+        return new Vertex(d * x, d * y);
+    }
+    public VertexInt multInt(double d) {
+        return new VertexInt((int)(d * x), (int)(d * y));
+    }
+}
