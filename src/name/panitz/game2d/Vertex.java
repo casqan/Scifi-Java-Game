@@ -12,6 +12,7 @@ public class Vertex {
 	public void add(Vertex that) {
 		x += that.x;
 		y += that.y;
+
 	}
 
 	public void moveTo(Vertex that) {
@@ -21,5 +22,12 @@ public class Vertex {
 
 	public Vertex mult(double d) {
 		return new Vertex(d * x, d * y);
+	}
+
+	//This is a basic lerp function
+	//lerp is short for linear interpolation
+	//It is used to smoothly move from one point to another
+	public static Vertex Lerp(Vertex a, Vertex b, double t){
+		return new Vertex(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
 	}
 }

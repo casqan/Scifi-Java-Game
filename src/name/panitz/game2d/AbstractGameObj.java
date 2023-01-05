@@ -1,15 +1,23 @@
 package name.panitz.game2d;
 public abstract class AbstractGameObj implements GameObj{
-  protected Vertex pos;
-  protected Vertex velocity;
-  protected double width;
-  protected double height;
+  public Vertex pos;
+  public Vertex velocity;
+  public Vertex anchor;
+  public double width;
+  public double height;
 
   public Vertex pos(){return pos;}
   public Vertex velocity(){return velocity;}
+  /**
+   * Added an Anchor point to more accurately Model the Hitbox of an Object, whose sprite fills more than
+   * the given game Objects size.
+   */
+  public Vertex anchor() {return anchor;}
+
   public double width(){return width;}
   public double height(){return height;}
 
+  public AbstractGameObj(){}
   public AbstractGameObj(Vertex p, Vertex v, double w, double h){
     pos=p; velocity=v; width=w; height=h;
   }

@@ -10,7 +10,6 @@ public class SwingScreen extends JPanel{
   public SwingScreen(Game gl) {
     this.logic = gl;
 
-
     t = new Timer(13, (ev)->{
         logic.move();
         logic.doChecks();

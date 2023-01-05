@@ -2,20 +2,25 @@ package name.panitz.game2d;
 public interface GameObj{
   Vertex pos();
   Vertex velocity();
+  Vertex anchor();
   double width();
   double height();
+
+  default int getZIndex(){
+    return (int)((pos().y + anchor().y) * 100);
+  };
 
   void paintTo(java.awt.Graphics g);
 
   default void move(){pos().add(velocity());}
 
-  default boolean isAbove(double y){return pos().y+height()<y;}
-  default boolean isAbove(GameObj that){return isAbove(that.pos().y);}
+  default boolean isAbove(double y){return pos().y + height() + anchor().y<y;}
+  default boolean isAbove(GameObj that){return isAbove(that.pos().y + that.anchor().y);}
 
   default boolean isUnderneath(GameObj that){return that.isAbove(this);}
 
-  default boolean isLeftOf(double x){return pos().x+width()<x;}
-  default boolean isLeftOf(GameObj that){return isLeftOf(that.pos().x);}
+  default boolean isLeftOf(double x){return pos().x + anchor().x + width()<x;}
+  default boolean isLeftOf(GameObj that){return isLeftOf(that.pos().x + that.anchor().x);}
   default boolean isRightOf(GameObj that){return that.isLeftOf(this);}
 
   default boolean touches(GameObj that){
