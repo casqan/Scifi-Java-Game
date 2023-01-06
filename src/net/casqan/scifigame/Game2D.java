@@ -7,6 +7,7 @@ import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.input.KeyAction;
 import net.casqan.scifigame.sprite.Animation;
+import net.casqan.scifigame.sprite.Character;
 import net.casqan.scifigame.sprite.Entity;
 import net.casqan.scifigame.sprite.EntityAction;
 import net.casqan.scifigame.sprite.SpriteSheet;
@@ -73,23 +74,61 @@ public class Game2D implements Game{
     public void init() {
         GameTime.Init();
 
-        Animation playerIdle = new Animation(new SpriteSheet("sprites/player/idle.png",
-                new VertexInt(88,30),3), 10,true);
-        Animation playermovePos = new Animation(new SpriteSheet("sprites/player/shuffe(move).png",
-                new VertexInt(88,30),3),10,true);
-        Animation playermoveNeg = new Animation(new SpriteSheet("sprites/player/shuffe(move).png",
-                new VertexInt(88,30),3),10,true);
-        Animation playerattack = new Animation(new SpriteSheet("sprites/player/Sweep with VFX.png",
-                new VertexInt(88,30),3),10,true);
+        VertexInt playerSize = new VertexInt(64,64);
+        int scale = 4;
+
+        Animation playerIdlepx = new Animation(new SpriteSheet("sprites/player/idlepx.png",
+                playerSize,scale), 12,true);
+        Animation playerIdlenx = new Animation(new SpriteSheet("sprites/player/idlenx.png",
+                playerSize,scale), 12,true);
+        Animation playerIdlepy = new Animation(new SpriteSheet("sprites/player/idlepy.png",
+                playerSize,scale), 12,true);
+        Animation playerIdleny = new Animation(new SpriteSheet("sprites/player/idleny.png",
+                playerSize,scale), 12,true);
+
+        Animation playerwalkpx = new Animation(new SpriteSheet("sprites/player/walkpx.png",
+                playerSize,scale), 12,true);
+        Animation playerwalknx = new Animation(new SpriteSheet("sprites/player/walknx.png",
+                playerSize,scale), 12,true);
+        Animation playerwalkpy = new Animation(new SpriteSheet("sprites/player/walkny.png",
+                playerSize,scale), 12,true);
+        Animation playerwalkny = new Animation(new SpriteSheet("sprites/player/walkpy.png",
+                playerSize,scale), 12,true);
+
+        Animation playerattackpx = new Animation(new SpriteSheet("sprites/player/attackpx.png",
+                playerSize,scale), 12,false);
+        Animation playerattacknx = new Animation(new SpriteSheet("sprites/player/attacknx.png",
+                playerSize,scale), 12,false);
+        Animation playerattackpy = new Animation(new SpriteSheet("sprites/player/attackny.png",
+                playerSize,scale), 12,false);
+        Animation playerattackny = new Animation(new SpriteSheet("sprites/player/attackpy.png",
+                playerSize,scale), 12,false);
 
         var playerAnimations = new HashMap<String,Animation>();
-        playerAnimations.put(EntityAction.IDLE, playerIdle);
-        playerAnimations.put(EntityAction.ATTACKPX, playerattack);
-        playerAnimations.put(EntityAction.MOVEPX, playermovePos);
-        playerAnimations.put(EntityAction.MOVENX, playermoveNeg);
-        Entity entity = new Entity(playerAnimations,new Vertex(0,0),
-                new Vertex(66,84),36,6,new Vertex(0,0),EntityAction.IDLE);
-        SetPlayer(entity);
+
+        playerAnimations.put(EntityAction.IDLEPX,playerIdlepx);
+        playerAnimations.put(EntityAction.IDLENX,playerIdlenx);
+        playerAnimations.put(EntityAction.IDLEPY,playerIdlepy);
+        playerAnimations.put(EntityAction.IDLENY,playerIdleny);
+
+        playerAnimations.put(EntityAction.MOVEPX,playerwalkpx);
+        playerAnimations.put(EntityAction.MOVENX,playerwalknx);
+        playerAnimations.put(EntityAction.MOVEPY,playerwalkpy);
+        playerAnimations.put(EntityAction.MOVENY,playerwalkny);
+
+        playerAnimations.put(EntityAction.ATTACKPX,playerattackpx);
+        playerAnimations.put(EntityAction.ATTACKNX,playerattacknx);
+        playerAnimations.put(EntityAction.ATTACKPY,playerattackpy);
+        playerAnimations.put(EntityAction.ATTACKNY,playerattackny);
+
+        Character _player = new Character(playerAnimations,new Vertex(0,0),
+                new Vertex(112,144),32,8,new Vertex(0,0),EntityAction.IDLEPX);
+        SetPlayer(_player);
+
+        playerattackpx.onAnimationEnd.AddListener((anim) -> _player.blockMove = false);
+        playerattacknx.onAnimationEnd.AddListener((anim) -> _player.blockMove = false);
+        playerattackpy.onAnimationEnd.AddListener((anim) -> _player.blockMove = false);
+        playerattackny.onAnimationEnd.AddListener((anim) -> _player.blockMove = false);
 
         damageRect = new Rect(player.pos().x + player.pos().x,
                 player.pos().y + player.anchor().y, 64,64);
@@ -107,6 +146,7 @@ public class Game2D implements Game{
         InputManager.RegisterOnKeyUp(VK_A,(key) -> player().velocity().add(new Vertex(2,0)));
 
         InputManager.RegisterOnKeyDown(VK_E,(key) -> {
+            _player.Attack();
             for (var gos : goss()) for (var go : gos) {
                 if (!damageRect.touches(go)) continue;
                 ((Entity)go).DealDamage(10);
@@ -115,9 +155,9 @@ public class Game2D implements Game{
 
         Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/idle.png",new VertexInt(64,64),3),10,true);
         var merchantAnimations = new HashMap<String,Animation>();
-        merchantAnimations.put(EntityAction.IDLE,merchantIdle);
+        merchantAnimations.put(EntityAction.IDLEPX,merchantIdle);
         Entity merchant = new Entity(merchantAnimations,new Vertex(200,0),
-                new Vertex(60,134),50,6,new Vertex(0,0),EntityAction.IDLE);
+                new Vertex(60,134),50,6,new Vertex(0,0),EntityAction.IDLEPX);
 
         var list = new ArrayList<GameObj>();
         //list.add(entity);
@@ -222,7 +262,6 @@ public class Game2D implements Game{
         g.setFont(font);
 
         //Draw Gimzmos
-        damageRect.setPos(player.pos());
         g.drawRect((int)damageRect.x(), (int)damageRect.y(), (int)damageRect.width(), (int)damageRect.height());
 
         //Draw UI
@@ -234,6 +273,8 @@ public class Game2D implements Game{
                 width - 200,48);
         g.drawString(String.format("X: %.2f", player.velocity().x) + String.format(" Y: %.2f",player.velocity().y),
                 width - 200,64);
+        g.drawString(String.format("Speed: %.2f", player.velocity().Magnitude()),
+                width - 200,80);
     }
 
     @Override

@@ -14,18 +14,15 @@ public class Entity extends AbstractGameObj {
 
     public Vertex pos;
     public Vertex velocity;
+    public Vertex forward;
     public Vertex anchor;
     public int height;
     public int width;
     public int maxHealth;
     public int health;
 
-    public Image image;
     public HashMap<String, Animation> animations;
-    public String currentAction = EntityAction.IDLE;
-
-    public int framerate;
-    public int frameIndex;
+    String currentAction = EntityAction.IDLEPX;
     final static Color shadow = new Color(0,0,0,0.1f);
 
     public Entity(){
@@ -34,8 +31,6 @@ public class Entity extends AbstractGameObj {
         anchor = new Vertex(0,0);
         height = 0;
         width = 0;
-        framerate = 0;
-        frameIndex = 0;
         animations = new HashMap<>();
     }
     public Entity(HashMap<String,Animation> animations, Vertex pos, Vertex anchor, int width, int height,
@@ -44,11 +39,10 @@ public class Entity extends AbstractGameObj {
         super(pos,velocity,animations.get(currentAction).sheet.scaled.x,animations.get(currentAction).sheet.scaled.y);
 
         this.animations = animations;
-        this.currentAction = currentAction;
-        frameIndex = 0;
-        image = animations.get(currentAction).GetFrame(frameIndex);
+        SetCurrentAction(currentAction);
         this.pos = pos;
         this.velocity = velocity;
+        this.forward = new Vertex(velocity.x,velocity.y);
         this.anchor = anchor;
         this.height = height;
         this.width = width;
@@ -72,6 +66,8 @@ public class Entity extends AbstractGameObj {
         return velocity;
     }
 
+    public Vertex forward() {return forward;}
+
     @Override
     public Vertex anchor() {
         return anchor;
@@ -94,22 +90,20 @@ public class Entity extends AbstractGameObj {
 
     public void SetCurrentAction(String action){
         currentAction = action;
+        animations.get(currentAction).Play();
     }
 
     Animation CurrentAnim(){
         return animations.get(currentAction);
     }
 
-    Image GetFrame(){
-        var index = (int) (GameTime.Time() * CurrentAnim().framerate) % CurrentAnim().frameCount;
-        return CurrentAnim().GetFrame(index);
-    }
     public void DealDamage(int damage){
+        System.out.println("Dealing damage to entity!");
         health -= damage;
     }
 
     @Override
     public void paintTo(Graphics g) {
-        g.drawImage(GetFrame(),(int)pos.x,(int)pos.y,null);
+        g.drawImage(CurrentAnim().GetCurrentFrame(), (int)pos.x,(int)pos.y,null);
     }
 }

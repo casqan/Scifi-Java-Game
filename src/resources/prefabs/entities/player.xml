@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entity>
+    <id>player</id>
+    <name>Player</name>
+    <anchorx>8</anchorx>
+    <anchory>8</anchory>
+    <scale>3</scale>
+    <animations>
+        <animation id="IDLEPX" path="/sprites/player/idlepx.xml" />
+        <animation id="IDLENX" path="/sprites/player/idlenx.xml" />
+        <animation id="IDLEPY" path="/sprites/player/idlepy.xml" />
+        <animation id="IDLENY" path="/sprites/player/idleny.xml" />
+        <animation id="WALKPX" path="/sprites/player/walkpx.xml" />
+        <animation id="WALKNX" path="/sprites/player/walknx.xml" />
+        <animation id="WALKPY" path="/sprites/player/walkpy.xml" />
+        <animation id="WALKNY" path="/sprites/player/walkny.xml" />
+        <animation id="ATTACKPX" path="/sprites/player/attackpx.xml" />
+        <animation id="ATTACKNX" path="/sprites/player/attacknx.xml" />
+        <animation id="ATTACKPY" path="/sprites/player/attackpy.xml" />
+        <animation id="ATTACKNY" path="/sprites/player/attackny.xml" />
+    </animations>
+</entity>

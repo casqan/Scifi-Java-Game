@@ -1,7 +1,10 @@
 package net.casqan.scifigame.sprite;
 
 public class EntityAction {
-    public static final String IDLE = "IDLE";
+    public static final String IDLEPX = "IDLEPX";
+    public static final String IDLENX = "IDLENX";
+    public static final String IDLEPY = "IDLEPY";
+    public static final String IDLENY = "IDLENY";
     public static final String MOVEPX = "MOVEPX";
     public static final String MOVENX = "MOVENX";
     public static final String MOVEPY = "MOVEPY";
