@@ -105,5 +105,7 @@ public class Entity extends AbstractGameObj {
     @Override
     public void paintTo(Graphics g) {
         g.drawImage(CurrentAnim().GetCurrentFrame(), (int)pos.x,(int)pos.y,null);
+        g.setColor(Color.GRAY);
+        g.drawRect((int)(pos().x + anchor().x) , (int)(pos().y + anchor().y),width,height);
     }
 }
