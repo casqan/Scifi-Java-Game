@@ -2,8 +2,12 @@ package net.casqan.scifigame;
 
 import name.panitz.game2d.*;
 import net.casqan.scifigame.core.GameTime;
+import net.casqan.scifigame.extensions.EmptyGameObj;
+import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
+import net.casqan.scifigame.gizmos.Gizmo;
+import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.input.KeyAction;
 import net.casqan.scifigame.sprite.Animation;
@@ -30,22 +34,28 @@ public class Game2D implements Game{
     //https://penusbmic.itch.io/sci-fi-character-pack-9
     int width;
     int height;
-    GameObj player;
+    Character player;
     Font font;
+
+    static Game instance;
+    public static Game getInstance() {
+        return instance;
+    }
+
     final Color backgroundColor = new Color(0.17f,0.17f,0.17f);
     List<List< ? extends GameObj>> activeObjects;
     ArrayList<GameObj> collidingWithPlayer = new ArrayList<>();
-    Rect damageRect;
+    //EmptyGameObj damageRect;
 
     Game2D(int width, int height){
+        instance = this;
         GameTime.Init();
-
         activeObjects = new ArrayList<>();
         this.width = width;
         this.height = height;
     }
 
-    public void SetPlayer(GameObj player){
+    public void SetPlayer(Character player){
         this.player = player;
     }
 
@@ -61,7 +71,7 @@ public class Game2D implements Game{
     }
 
     @Override
-    public GameObj player() {
+    public Character player() {
         return player;
     }
 
@@ -76,7 +86,7 @@ public class Game2D implements Game{
 
         VertexInt playerSize = new VertexInt(64,64);
         int scale = 4;
-
+        
         Animation playerIdlepx = new Animation(new SpriteSheet("sprites/player/idlepx.png",
                 playerSize,scale), 12,true);
         Animation playerIdlenx = new Animation(new SpriteSheet("sprites/player/idlenx.png",
@@ -122,16 +132,14 @@ public class Game2D implements Game{
         playerAnimations.put(EntityAction.ATTACKNY,playerattackny);
 
         Character _player = new Character(playerAnimations,new Vertex(0,0),
-                new Vertex(112,144),32,8,new Vertex(0,0),EntityAction.IDLEPX);
+                new Vertex(112,132),32,16,new Vertex(0,0),EntityAction.IDLEPX);
         SetPlayer(_player);
+        //damageRect = new EmptyGameObj(_player.anchor(),_player.pos(),new Vertex(1,0),10,10);
 
-        playerattackpx.onAnimationEnd.AddListener((anim) -> _player.blockMove = false);
-        playerattacknx.onAnimationEnd.AddListener((anim) -> _player.blockMove = false);
-        playerattackpy.onAnimationEnd.AddListener((anim) -> _player.blockMove = false);
-        playerattackny.onAnimationEnd.AddListener((anim) -> _player.blockMove = false);
-
-        damageRect = new Rect(player.pos().x + player.pos().x,
-                player.pos().y + player.anchor().y, 64,64);
+        playerattackpx.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
+        playerattacknx.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
+        playerattackpy.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
+        playerattackny.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
 
         InputManager.RegisterOnKeyDown(VK_W,(key) -> player().velocity().add(new Vertex(0,-2)));
         InputManager.RegisterOnKeyUp(VK_W,(key) -> player().velocity().add(new Vertex(0,2)));
@@ -145,26 +153,64 @@ public class Game2D implements Game{
         InputManager.RegisterOnKeyDown(VK_A,(key) -> player().velocity().add(new Vertex(-2,0)));
         InputManager.RegisterOnKeyUp(VK_A,(key) -> player().velocity().add(new Vertex(2,0)));
 
+        InputManager.RegisterOnKeyDown(VK_R,(key) -> Gizmos.Clear());
+
+        _player.name = "player";
         InputManager.RegisterOnKeyDown(VK_E,(key) -> {
+            if (player.attacking) return;
+            System.out.println("==================ATTACK DATA==================");
             _player.Attack();
-            for (var gos : goss()) for (var go : gos) {
-                if (!damageRect.touches(go)) continue;
-                ((Entity)go).DealDamage(10);
+            System.out.println("Attacking!");
+            Vertex size = new Vertex(64,64);
+            Vertex pos = Vertex.add(player.pos(),player.anchor());
+
+
+            //There is absolutely a cleaner Mathematical way to do this,
+            // but I'm not going to bother implementing it, because this just works
+            if (player.forward().x > 0) {
+                pos.x += player.width();
+                pos.y -= size.y / 2f - player.height() / 2f;
             }
+            else if (player.forward().x < 0) {
+                pos.x -= size.x;
+                pos.y -= size.y / 2f - player.height()/ 2f;
+            }
+
+            if (player.forward().y > 0){
+                pos.y += player.height();
+                pos.x -= size.x / 2f - player.width()/ 2f;
+            }
+            else if (player.forward.y < 0) {
+                pos.y -= size.y;
+                pos.x -= size.x / 2f - player.width()/ 2f;
+            }
+
+            var r = new Rect(pos,size);
+            Gizmos.Add(new Gizmo(r,Color.red));
+            var col = Physics.OverlapRect(new Vertex(player.pos()).add(player.anchor()), new Vertex(1000,1000));
+            for (var go : col){
+                System.out.println("Overlap with: " + go.name());
+                if (go == player) continue;
+                System.out.println(go instanceof Entity);
+                if (!(go instanceof Entity)) continue;
+                ((Entity)go).DealDamage(20);
+            }
+            System.out.println("====================================");
         });
 
-        Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/idle.png",new VertexInt(64,64),3),10,true);
+        Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/idle.png",
+                new VertexInt(64,64),3),10,true);
         var merchantAnimations = new HashMap<String,Animation>();
         merchantAnimations.put(EntityAction.IDLEPX,merchantIdle);
         Entity merchant = new Entity(merchantAnimations,new Vertex(200,0),
                 new Vertex(60,134),50,6,new Vertex(0,0),EntityAction.IDLEPX);
+        merchant.name = "merchant";
 
         var list = new ArrayList<GameObj>();
-        //list.add(entity);
         list.add(merchant);
         list.add(player);
+        //list.add(damageRect);
         goss().add(list);
-
         try{
             InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavtt.ttf");
             font = Font.createFont(Font.TRUETYPE_FONT,in).deriveFont(20f);
@@ -181,7 +227,6 @@ public class Game2D implements Game{
 
     @Override
     public void move() {
-
         player.move();
         for (List<? extends GameObj> gos : goss()) {
             for (GameObj go : gos) {
@@ -261,10 +306,11 @@ public class Game2D implements Game{
         g.setColor(Color.white);
         g.setFont(font);
 
-        //Draw Gimzmos
-        g.drawRect((int)damageRect.x(), (int)damageRect.y(), (int)damageRect.width(), (int)damageRect.height());
+        //Draw Gizmos
+        //Gizmos.paintTo(g);
 
         //Draw UI
+        g.setColor(Color.white);
         g.drawString(String.format("Time: %.2f", GameTime.Time()),
                 width - 200,16);
         g.drawString(String.format("FPS: %.2f", 1f / GameTime.DeltaTime()),
