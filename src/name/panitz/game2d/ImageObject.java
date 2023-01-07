@@ -1,7 +1,7 @@
 package name.panitz.game2d;
 import java.awt.*;
 import javax.swing.ImageIcon;
-public record ImageObject( Vertex pos, Vertex velocity, Vertex anchor
+public record ImageObject(String name, Vertex pos, Vertex velocity, Vertex anchor
                   , double width, double height
                   , String fileName, Image image)
     implements GameObj{
@@ -15,7 +15,7 @@ public record ImageObject( Vertex pos, Vertex velocity, Vertex anchor
   }
 
   public ImageObject(Vertex pos,Vertex anchor,Vertex velocity, String fileName){
-    this(pos,velocity,anchor,0,0,fileName,null);
+    this("", pos,velocity,anchor,0,0,fileName,null);
   }
 
   public ImageObject(String fileName){
