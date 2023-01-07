@@ -5,6 +5,7 @@ public interface GameObj{
   Vertex anchor();
   double width();
   double height();
+  String name();
 
   default int getZIndex(){
     return (int)((pos().y + anchor().y) * 100);
