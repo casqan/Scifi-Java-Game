@@ -12,11 +12,22 @@ public class Vertex {
 		this.x = x;
 		this.y = y;
 	}
+	public Vertex(Vertex vertex) {
+		this.x = vertex.x;
+		this.y = vertex.y;
+	}
 
-	public void add(Vertex that) {
+	public Vertex add(Vertex that) {
 		x += that.x;
 		y += that.y;
+		return this;
+	}
 
+	public static Vertex add(Vertex v1, Vertex v2){
+		return new Vertex(v1.x + v2.x, v1.y + v2.y);
+	}
+	public static Vertex sub(Vertex v1, Vertex v2){
+		return new Vertex(v1.x - v2.x, v1.y - v2.y);
 	}
 
 	public void moveTo(Vertex that) {
@@ -26,6 +37,14 @@ public class Vertex {
 
 	public Vertex mult(double d) {
 		return new Vertex(d * x, d * y);
+	}
+
+	@Override
+	public String toString() {
+		return "Vertex{" +
+				"x=" + x +
+				", y=" + y +
+				'}';
 	}
 
 	//This is a basic lerp function
