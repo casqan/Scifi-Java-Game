@@ -7,8 +7,7 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Character extends Entity{
-    public Rect hitbox;
-    public boolean blockMove = false;
+    public boolean attacking = false;
 
     public Character(HashMap<String, Animation> animations, Vertex pos, Vertex anchor, int width, int height, Vertex velocity, String currentAction) {
         super(animations, pos, anchor, width, height, velocity, currentAction);
@@ -17,7 +16,7 @@ public class Character extends Entity{
     //This is probably not the cleanest way to do this, it would be better to wrap this in a function,
     //That Takes the direction and all Directional Animations, but IDC RN
     public void Attack(){
-        blockMove = true;
+        attacking = true;
         if (forward().x > 0 && (!currentAction.equals(EntityAction.ATTACKPX))) SetCurrentAction(EntityAction.ATTACKPX);
         if (forward().x < 0 && (!currentAction.equals(EntityAction.ATTACKNX))) SetCurrentAction(EntityAction.ATTACKNX);
         if (forward().y > 0 && (!currentAction.equals(EntityAction.ATTACKPY))) SetCurrentAction(EntityAction.ATTACKPY);
@@ -26,7 +25,7 @@ public class Character extends Entity{
 
     @Override
     public void move(){
-        if (blockMove) return;
+        if (attacking) return;
         super.move();
         if (velocity.Magnitude() > 0){
             forward.x = velocity.x;
