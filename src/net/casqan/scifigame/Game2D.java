@@ -15,13 +15,14 @@ import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.sprite.*;
 import net.casqan.scifigame.entities.Character;
+import net.casqan.scifigame.tilesystem.Environment;
+import net.casqan.scifigame.tilesystem.Tilemap;
+import net.casqan.scifigame.tilesystem.Tileset;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,6 +48,7 @@ public class Game2D implements Game{
 
     final Color backgroundColor = new Color(0.17f,0.17f,0.17f);
     HashMap<String,List<GameObj>> activeObjects;
+    Set<String> damageLayers;
     List<GameObj> collidingWithPlayer = new ArrayList<>();
     //EmptyGameObj damageRect;
 
@@ -172,6 +174,8 @@ public class Game2D implements Game{
 
         InputManager.RegisterOnKeyDown(VK_R,(key) -> Gizmos.Clear());
 
+        damageLayers = new HashSet<>();
+        damageLayers.add(L_ENTITIES);
         InputManager.RegisterOnKeyDown(VK_E,(key) -> {
             if (player.attacking) return;
             System.out.println("==================ATTACK DATA==================");
@@ -203,7 +207,7 @@ public class Game2D implements Game{
 
             var r = new Rect(pos,size);
             Gizmos.Add(new Gizmo(r,Color.red));
-            var col = Physics.OverlapRect(r);
+            var col = Physics.OverlapRect(r,damageLayers);
             for (var go : col){
                 System.out.println("Overlap with: " + go.name());
                 if (go == player) continue;
@@ -263,18 +267,30 @@ public class Game2D implements Game{
 
         //Spawn Enemies
         var list = new ArrayList<GameObj>();
-        list.add(merchant);
         list.add(player);
-        //list.add(enemy);
-        for (int i = 0; i < 5; i++){
-            var pos = new Vertex(.5f - Math.random(), .5f - Math.random());
-            pos.Normalize();
-            Enemy instance = new Enemy(player2,pos.mult(500));
-            instance.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
-            list.add(instance);
-        }
+
+
+        InputManager.RegisterOnKeyDown(VK_SPACE,(key) -> {
+            SpawnEnemy(player2);
+        });
 
         goss().put(L_ENTITIES, list);
+        for (int i = 0; i < 5; i++) SpawnEnemy(player2);
+
+        //Build Map
+        var Tileset = new Tileset("sprites/tileset/tileset.png",32,32);
+        var tiles = new String[][] {
+                new String[] {"0;1","0;3","0;2","0;0"},
+                new String[] {"0;0","0;0","0;0","1;0"},
+                new String[] {"0;0","0;0","0;0","0;0"},
+                new String[] {"0;0","0;0","0;0","0;0"},
+        } ;
+        var TileMap = new Tilemap(Tileset,tiles,4);
+        var environment = new Environment(TileMap,new Vertex(0,0));
+        List<GameObj> env = new ArrayList<>();
+        env.add(environment);
+        goss().put(L_STATICS,env);
+
         try{
             InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavtt.ttf");
             font = Font.createFont(Font.TRUETYPE_FONT,in).deriveFont(15f);
@@ -285,6 +301,13 @@ public class Game2D implements Game{
         }
     }
 
+    public void SpawnEnemy(Enemy enemy){
+            var pos = new Vertex(.5f - Math.random(), .5f - Math.random());
+            pos.Normalize();
+            Enemy instance = new Enemy(enemy,pos.mult(500));
+            instance.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
+            goss().get(L_ENTITIES).add(instance);
+    }
     @Override
     public void move() {
         player.move();
@@ -363,7 +386,7 @@ public class Game2D implements Game{
             };
 
         //Draw Gizmos
-        //Gizmos.paintTo(g);
+        Gizmos.paintTo(g);
 
         //Draw UI
         PaintUI(g);
