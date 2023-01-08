@@ -1,5 +1,7 @@
 package net.casqan.scifigame.gizmos;
 
+import net.casqan.scifigame.core.Camera;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,8 +18,9 @@ public class Gizmos {
     public static void paintTo(Graphics g){
         for (var giz : rectList){
             g.setColor(giz.color);
-            g.drawRect((int)giz.rect.pos().x,
-                    (int)giz.rect.pos().y,
+            var sp = Camera.WorldToScreenPosition(giz.rect.pos());
+            g.drawRect((int)sp.x,
+                    (int)sp.y,
                     (int)giz.rect.width(),
                     (int)giz.rect.height());
         }
