@@ -1,4 +1,7 @@
 package name.panitz.game2d;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.awt.event.*;
 import java.awt.*;
@@ -11,7 +14,7 @@ public interface Game{
 
   GameObj player();
 
-  List<List<? extends GameObj>> goss();
+  HashMap<String, List<? extends GameObj>> goss();
 
   void init();
 
@@ -24,7 +27,7 @@ public interface Game{
 
   default void move(){
     if (ended()) return;
-    for (var gos:goss()) gos.forEach(go -> go.move());
+    for (var key:goss().keySet()) for (var go : goss().get(key)) go.move();
     player().move();
   }
 
@@ -37,7 +40,7 @@ public interface Game{
 
 
   default void paintTo(Graphics g){
-    for (var gos:goss()) gos.forEach( go -> go.paintTo(g));
+    for (var key:goss().keySet()) for (var go : goss().get(key)) go.paintTo(g);
     player().paintTo(g);
   }
 

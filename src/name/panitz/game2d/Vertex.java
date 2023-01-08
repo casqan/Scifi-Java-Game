@@ -17,10 +17,9 @@ public class Vertex {
 		this.y = vertex.y;
 	}
 
-	public Vertex add(Vertex that) {
+	public void add(Vertex that) {
 		x += that.x;
 		y += that.y;
-		return this;
 	}
 
 	public static Vertex add(Vertex v1, Vertex v2){

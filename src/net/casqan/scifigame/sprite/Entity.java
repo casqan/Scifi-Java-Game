@@ -3,14 +3,17 @@ package net.casqan.scifigame.sprite;
 import name.panitz.game2d.AbstractGameObj;
 import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
+import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.core.*;
+import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.sprite.Animation;
 import net.casqan.scifigame.sprite.EntityAction;
 
 import java.awt.*;
 import java.util.HashMap;
+import java.util.Map;
 
-public class Entity extends AbstractGameObj {
+public class Entity extends AbstractGameObj implements Cloneable{
 
     public Vertex pos;
     public Vertex velocity;
@@ -20,6 +23,8 @@ public class Entity extends AbstractGameObj {
     public int width;
     public int maxHealth;
     public int health;
+
+    public Event<Entity> onDeath = new Event<>();
 
     public HashMap<String, Animation> animations;
     String currentAction = EntityAction.IDLEPX;
@@ -37,7 +42,6 @@ public class Entity extends AbstractGameObj {
                   Vertex velocity,String currentAction){
 
         super(pos,velocity,animations.get(currentAction).sheet.scaled.x,animations.get(currentAction).sheet.scaled.y);
-
         this.animations = animations;
         SetCurrentAction(currentAction);
         this.pos = pos;
@@ -46,11 +50,11 @@ public class Entity extends AbstractGameObj {
         this.anchor = anchor;
         this.height = height;
         this.width = width;
+        onDeath.AddListener(entity -> {
+            Die();
+        });
     }
 
-    public Entity(Vertex p, Vertex v, double w, double h) {
-        super(p, v, w, h);
-    }
 
     public void SetVelocity(Vertex velocity) {
         this.velocity = velocity;
@@ -100,6 +104,14 @@ public class Entity extends AbstractGameObj {
     public void DealDamage(int damage){
         System.out.println("Dealing damage to entity!");
         health -= damage;
+        if (health <= 0){
+            onDeath.Invoke(this);
+        }
+    }
+    public void Die(){
+        SetCurrentAction(EntityAction.DEATH);
+        animations.get(EntityAction.DEATH).onAnimationEnd.AddListener(
+                (var) -> Game2D.getInstance().goss().get(Game2D.L_ENTITIES).remove(this));
     }
 
     @Override
@@ -108,4 +120,5 @@ public class Entity extends AbstractGameObj {
         g.setColor(Color.GRAY);
         g.drawRect((int)(pos().x + anchor().x) , (int)(pos().y + anchor().y),width,height);
     }
+
 }

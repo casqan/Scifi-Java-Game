@@ -8,6 +8,7 @@ import net.casqan.scifigame.Game2D;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public final class Physics {
     public static Collection<GameObj> OverlapRect(Vertex pos, Vertex size){
@@ -15,9 +16,13 @@ public final class Physics {
         return OverlapRect(rect);
     }
     public static Collection<GameObj> OverlapRect(Rect rect){
+        return OverlapRect(rect,Game2D.getInstance().goss().keySet());
+    }
+
+    public static Collection<GameObj> OverlapRect(Rect rect, Set<String> layers){
         var col = new ArrayList<GameObj>();
-        for (var gos : Game2D.getInstance().goss()){
-            for (var go : gos){
+        for (var layer : layers){
+            for (var go : Game2D.getInstance().goss().get(layer)){
                 if (rect.touches(go)) col.add(go);
             }
         }

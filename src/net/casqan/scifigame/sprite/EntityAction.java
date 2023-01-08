@@ -13,4 +13,5 @@ public class EntityAction {
     public static final String ATTACKNX = "ATTACKNX";
     public static final String ATTACKPY = "ATTACKPY";
     public static final String ATTACKNY = "ATTACKNY";
+    public static final String DEATH = "DEATH";
 }

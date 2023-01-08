@@ -2,14 +2,12 @@ package net.casqan.scifigame;
 
 import name.panitz.game2d.*;
 import net.casqan.scifigame.core.GameTime;
-import net.casqan.scifigame.extensions.EmptyGameObj;
 import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.gizmos.Gizmo;
 import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
-import net.casqan.scifigame.input.KeyAction;
 import net.casqan.scifigame.sprite.Animation;
 import net.casqan.scifigame.sprite.Character;
 import net.casqan.scifigame.sprite.Entity;
@@ -18,8 +16,6 @@ import net.casqan.scifigame.sprite.SpriteSheet;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.beans.XMLEncoder;
-import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -31,7 +27,9 @@ import static java.awt.event.KeyEvent.*;
 
 public class Game2D implements Game{
 
-    //https://penusbmic.itch.io/sci-fi-character-pack-9
+    public static final String L_ENTITIES = "L_ENTITIES";
+    public static final String L_STATICS = "L_STATICS";
+
     int width;
     int height;
     Character player;
@@ -43,14 +41,16 @@ public class Game2D implements Game{
     }
 
     final Color backgroundColor = new Color(0.17f,0.17f,0.17f);
-    List<List< ? extends GameObj>> activeObjects;
-    ArrayList<GameObj> collidingWithPlayer = new ArrayList<>();
+    HashMap<String,List< ? extends GameObj>> activeObjects;
+    List<GameObj> collidingWithPlayer = new ArrayList<>();
     //EmptyGameObj damageRect;
 
     Game2D(int width, int height){
         instance = this;
         GameTime.Init();
-        activeObjects = new ArrayList<>();
+        activeObjects = new HashMap<>();
+        activeObjects.put(L_STATICS,new ArrayList<>());
+        activeObjects.put(L_ENTITIES,new ArrayList<>());
         this.width = width;
         this.height = height;
     }
@@ -76,13 +76,14 @@ public class Game2D implements Game{
     }
 
     @Override
-    public List<List<? extends GameObj>> goss() {
+    public HashMap<String, List<? extends GameObj>> goss() {
         return activeObjects;
     }
 
     @Override
     public void init() {
         GameTime.Init();
+        instance = this;
 
         VertexInt playerSize = new VertexInt(64,64);
         int scale = 4;
@@ -187,7 +188,7 @@ public class Game2D implements Game{
 
             var r = new Rect(pos,size);
             Gizmos.Add(new Gizmo(r,Color.red));
-            var col = Physics.OverlapRect(new Vertex(player.pos()).add(player.anchor()), new Vertex(1000,1000));
+            var col = Physics.OverlapRect(r);
             for (var go : col){
                 System.out.println("Overlap with: " + go.name());
                 if (go == player) continue;
@@ -195,13 +196,17 @@ public class Game2D implements Game{
                 if (!(go instanceof Entity)) continue;
                 ((Entity)go).DealDamage(20);
             }
+            System.gc();
             System.out.println("====================================");
         });
 
         Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/idle.png",
                 new VertexInt(64,64),3),10,true);
+        Animation merchantDeath = new Animation(new SpriteSheet("sprites/merchant/walk.png",
+                new VertexInt(64,64),3),10,false);
         var merchantAnimations = new HashMap<String,Animation>();
         merchantAnimations.put(EntityAction.IDLEPX,merchantIdle);
+        merchantAnimations.put(EntityAction.DEATH,merchantDeath);
         Entity merchant = new Entity(merchantAnimations,new Vertex(200,0),
                 new Vertex(60,134),50,6,new Vertex(0,0),EntityAction.IDLEPX);
         merchant.name = "merchant";
@@ -210,7 +215,7 @@ public class Game2D implements Game{
         list.add(merchant);
         list.add(player);
         //list.add(damageRect);
-        goss().add(list);
+        goss().put(L_ENTITIES, list);
         try{
             InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavtt.ttf");
             font = Font.createFont(Font.TRUETYPE_FONT,in).deriveFont(20f);
@@ -228,17 +233,15 @@ public class Game2D implements Game{
     @Override
     public void move() {
         player.move();
-        for (List<? extends GameObj> gos : goss()) {
-            for (GameObj go : gos) {
-                if (go == player) continue;
-                if (go.touches(player)) collidingWithPlayer.add(go);
-                go.move();
-            }
+        for (GameObj go : goss().get(L_ENTITIES)) {
+            if (go == player) continue;
+            if (go.touches(player)) collidingWithPlayer.add(go);
+            go.move();
         }
 
         if(collidingWithPlayer.size() == 0)  return;
         //Get Vertex of Player pos and colliding Object pos
-        //move player away from Object
+        //move Object away from Player
         for (GameObj go : collidingWithPlayer){
             go.pos().add(new Vertex(-go.velocity().x,-go.velocity().y));
             go.pos().add(new Vertex(player().velocity().x,player().velocity().y));
@@ -293,23 +296,25 @@ public class Game2D implements Game{
         g.setColor(Color.white);
 
         //Sort by y-Coordinate
-        List<? extends GameObj> sorted = goss()
-                .stream()
-                .flatMap(List::stream)                              //Make 2D List 1D
-                .sorted(Comparator.comparingInt(GameObj::getZIndex))//Compare Z-Index
-                .toList();                                          //Convert back to List
+        goss().put(L_ENTITIES,
+                goss().get(L_ENTITIES).stream()                      //Convert to Stream
+                .sorted(Comparator.comparingInt(GameObj::getZIndex)) //Compare Z-Index
+                .collect(Collectors.toList()));                      //Convert back to List
 
-        //Draw all GameObjects
-        for (var go : sorted) go.paintTo(g);
-
-        //Setup Font
-        g.setColor(Color.white);
-        g.setFont(font);
+        //Draw all StaticObjects
+        for (var go : goss().get(L_STATICS)) go.paintTo(g);
+        for (var go : goss().get(L_ENTITIES)) go.paintTo(g);
 
         //Draw Gizmos
         //Gizmos.paintTo(g);
 
         //Draw UI
+        PaintUI(g);
+
+    }
+
+    public void PaintUI(Graphics g){
+        g.setFont(font);
         g.setColor(Color.white);
         g.drawString(String.format("Time: %.2f", GameTime.Time()),
                 width - 200,16);
