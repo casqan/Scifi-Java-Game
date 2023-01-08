@@ -176,7 +176,7 @@ public class Game2D implements Game{
 
         damageLayers = new HashSet<>();
         damageLayers.add(L_ENTITIES);
-        InputManager.RegisterOnKeyDown(VK_E,(key) -> {
+        InputManager.RegisterOnKeyDown(VK_SPACE,(key) -> {
             if (player.attacking) return;
             System.out.println("==================ATTACK DATA==================");
             _player.Attack();
@@ -184,18 +184,8 @@ public class Game2D implements Game{
             Vertex size = new Vertex(64,64);
             Vertex pos = Vertex.add(player.pos(),player.anchor());
 
-
             //There is absolutely a cleaner Mathematical way to do this,
             // but I'm not going to bother implementing it, because this just works
-            if (player.forward().x > 0) {
-                pos.x += player.width();
-                pos.y -= size.y / 2f - player.height() / 2f;
-            }
-            else if (player.forward().x < 0) {
-                pos.x -= size.x;
-                pos.y -= size.y / 2f - player.height()/ 2f;
-            }
-
             if (player.forward().y > 0){
                 pos.y += player.height();
                 pos.x -= size.x / 2f - player.width()/ 2f;
@@ -204,6 +194,15 @@ public class Game2D implements Game{
                 pos.y -= size.y;
                 pos.x -= size.x / 2f - player.width()/ 2f;
             }
+            else if (player.forward().x > 0) {
+                pos.x += player.width();
+                pos.y -= size.y / 2f - player.height() / 2f;
+            }
+            else if (player.forward().x < 0) {
+                pos.x -= size.x;
+                pos.y -= size.y / 2f - player.height()/ 2f;
+            }
+
 
             var r = new Rect(pos,size);
             Gizmos.Add(new Gizmo(r,Color.red));
@@ -270,7 +269,7 @@ public class Game2D implements Game{
         list.add(player);
 
 
-        InputManager.RegisterOnKeyDown(VK_SPACE,(key) -> {
+        InputManager.RegisterOnKeyDown(VK_E,(key) -> {
             SpawnEnemy(player2);
         });
 
@@ -408,11 +407,11 @@ public class Game2D implements Game{
         g.drawString(String.format("Health: %d", player.health),
                 width - 200,96);
         g.drawString(String.format("Entities: "),
-                0,0);
+                0,16);
         for(int i = 0; i < goss().get(L_ENTITIES).size(); i++){
             var o = goss().get(L_ENTITIES).get(i);
             g.drawString(String.format(o.name() + "|" + String.format("x:%.2f",o.pos().x) +
-                    " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 1));
+                    " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 2));
         }
     }
 
