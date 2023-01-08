@@ -32,6 +32,7 @@ public class SpriteSheet {
     public int getSpriteCount() {
         return spriteCount;
     }
+    public VertexInt getScaled(){return scaled;}
 
     public Image getSheet() {
         return sheet;

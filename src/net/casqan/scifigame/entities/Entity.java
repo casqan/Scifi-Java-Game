@@ -1,17 +1,15 @@
-package net.casqan.scifigame.sprite;
+package net.casqan.scifigame.entities;
 
 import name.panitz.game2d.AbstractGameObj;
-import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.core.*;
 import net.casqan.scifigame.core.Event;
-import net.casqan.scifigame.sprite.Animation;
-import net.casqan.scifigame.sprite.EntityAction;
+import net.casqan.scifigame.animations.Animation;
+import net.casqan.scifigame.animations.EntityAction;
 
 import java.awt.*;
 import java.util.HashMap;
-import java.util.Map;
 
 public class Entity extends AbstractGameObj implements Cloneable{
 
@@ -41,7 +39,8 @@ public class Entity extends AbstractGameObj implements Cloneable{
     public Entity(HashMap<String,Animation> animations, Vertex pos, Vertex anchor, int width, int height,
                   Vertex velocity,String currentAction){
 
-        super(pos,velocity,animations.get(currentAction).sheet.scaled.x,animations.get(currentAction).sheet.scaled.y);
+        super(pos,velocity,animations.get(currentAction).getSheet().getScaled().x,
+                animations.get(currentAction).getSheet().getScaled().y);
         this.animations = animations;
         SetCurrentAction(currentAction);
         this.pos = pos;
@@ -116,9 +115,11 @@ public class Entity extends AbstractGameObj implements Cloneable{
 
     @Override
     public void paintTo(Graphics g) {
-        g.drawImage(CurrentAnim().GetCurrentFrame(), (int)pos.x,(int)pos.y,null);
+        var sp = getScreenPos();
+        g.drawImage(CurrentAnim().GetCurrentFrame(), (int)sp.x,(int)sp.y,null);
         g.setColor(Color.GRAY);
-        g.drawRect((int)(pos().x + anchor().x) , (int)(pos().y + anchor().y),width,height);
+        var anchored = Camera.WorldToScreenPosition(Vertex.add(pos(),anchor()));
+        g.drawRect((int)anchored.x ,(int) anchored.y,width,height);
     }
 
 }

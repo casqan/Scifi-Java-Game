@@ -1,18 +1,20 @@
 package net.casqan.scifigame;
 
 import name.panitz.game2d.*;
+import net.casqan.scifigame.animations.Animation;
+import net.casqan.scifigame.animations.EntityAction;
+import net.casqan.scifigame.core.Camera;
 import net.casqan.scifigame.core.GameTime;
+import net.casqan.scifigame.entities.Enemy;
+import net.casqan.scifigame.entities.Entity;
 import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.gizmos.Gizmo;
 import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
-import net.casqan.scifigame.sprite.Animation;
-import net.casqan.scifigame.sprite.Character;
-import net.casqan.scifigame.sprite.Entity;
-import net.casqan.scifigame.sprite.EntityAction;
-import net.casqan.scifigame.sprite.SpriteSheet;
+import net.casqan.scifigame.sprite.*;
+import net.casqan.scifigame.entities.Character;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -33,26 +35,33 @@ public class Game2D implements Game{
     int width;
     int height;
     Character player;
+    Camera camera;
     Font font;
 
-    static Game instance;
-    public static Game getInstance() {
+    Vertex screen;
+    public Vertex getScreen() {
+        return screen;
+    }
+    static Game2D instance;
+    public static Game2D getInstance() {
         return instance;
     }
 
     final Color backgroundColor = new Color(0.17f,0.17f,0.17f);
-    HashMap<String,List< ? extends GameObj>> activeObjects;
+    HashMap<String,List<GameObj>> activeObjects;
     List<GameObj> collidingWithPlayer = new ArrayList<>();
     //EmptyGameObj damageRect;
 
     Game2D(int width, int height){
         instance = this;
+
         GameTime.Init();
         activeObjects = new HashMap<>();
         activeObjects.put(L_STATICS,new ArrayList<>());
         activeObjects.put(L_ENTITIES,new ArrayList<>());
         this.width = width;
         this.height = height;
+        screen = new Vertex(width/2f,height/2f);
     }
 
     public void SetPlayer(Character player){
@@ -76,7 +85,7 @@ public class Game2D implements Game{
     }
 
     @Override
-    public HashMap<String, List<? extends GameObj>> goss() {
+    public HashMap<String, List<GameObj>> goss() {
         return activeObjects;
     }
 
@@ -134,8 +143,13 @@ public class Game2D implements Game{
 
         Character _player = new Character(playerAnimations,new Vertex(0,0),
                 new Vertex(112,132),32,16,new Vertex(0,0),EntityAction.IDLEPX);
+        _player.onDeath.Clear();
+        _player.name = "player";
+        player.health = 200;
         SetPlayer(_player);
-        //damageRect = new EmptyGameObj(_player.anchor(),_player.pos(),new Vertex(1,0),10,10);
+
+        camera = new Camera();
+        Camera.main = camera;
 
         playerattackpx.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
         playerattacknx.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
@@ -156,7 +170,6 @@ public class Game2D implements Game{
 
         InputManager.RegisterOnKeyDown(VK_R,(key) -> Gizmos.Clear());
 
-        _player.name = "player";
         InputManager.RegisterOnKeyDown(VK_E,(key) -> {
             if (player.attacking) return;
             System.out.println("==================ATTACK DATA==================");
@@ -200,6 +213,11 @@ public class Game2D implements Game{
             System.out.println("====================================");
         });
 
+        Enemy enemy = new Enemy(playerAnimations,new Vertex(1000,600),
+                new Vertex(112,132),32,16,new Vertex(0,0),EntityAction.IDLEPX);
+        enemy.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
+        enemy.maxHealth = 20;
+
         Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/idle.png",
                 new VertexInt(64,64),3),10,true);
         Animation merchantDeath = new Animation(new SpriteSheet("sprites/merchant/walk.png",
@@ -214,6 +232,14 @@ public class Game2D implements Game{
         var list = new ArrayList<GameObj>();
         list.add(merchant);
         list.add(player);
+        //list.add(enemy);
+        for (int i = 0; i < 10; i++){
+            var pos = new Vertex(.5f - Math.random(), .5f - Math.random());
+            pos.Normalize();
+            Enemy instance = new Enemy(enemy,pos.mult(400));
+            instance.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
+            list.add(instance);
+        }
         //list.add(damageRect);
         goss().put(L_ENTITIES, list);
         try{
@@ -226,13 +252,10 @@ public class Game2D implements Game{
         }
     }
 
-    public void Instantiate(GameObj gameObj){
-
-    }
-
     @Override
     public void move() {
         player.move();
+        camera.pos = Vertex.Lerp(camera.pos,Vertex.add(player.pos,player.anchor),GameTime.DeltaTime() * 5);
         for (GameObj go : goss().get(L_ENTITIES)) {
             if (go == player) continue;
             if (go.touches(player)) collidingWithPlayer.add(go);
@@ -243,6 +266,7 @@ public class Game2D implements Game{
         //Get Vertex of Player pos and colliding Object pos
         //move Object away from Player
         for (GameObj go : collidingWithPlayer){
+            go.Colliding();
             go.pos().add(new Vertex(-go.velocity().x,-go.velocity().y));
             go.pos().add(new Vertex(player().velocity().x,player().velocity().y));
         }
@@ -303,14 +327,17 @@ public class Game2D implements Game{
 
         //Draw all StaticObjects
         for (var go : goss().get(L_STATICS)) go.paintTo(g);
-        for (var go : goss().get(L_ENTITIES)) go.paintTo(g);
+        for (var go : goss().get(L_ENTITIES))
+            try { go.paintTo(g); }
+            catch (Exception e) {
+                //System.out.println(e);
+            };
 
         //Draw Gizmos
         //Gizmos.paintTo(g);
 
         //Draw UI
         PaintUI(g);
-
     }
 
     public void PaintUI(Graphics g){
@@ -324,8 +351,10 @@ public class Game2D implements Game{
                 width - 200,48);
         g.drawString(String.format("X: %.2f", player.velocity().x) + String.format(" Y: %.2f",player.velocity().y),
                 width - 200,64);
-        g.drawString(String.format("Speed: %.2f", player.velocity().Magnitude()),
+        g.drawString(String.format("Speed: %.2f", player.velocity().magnitude()),
                 width - 200,80);
+        g.drawString(String.format("Health: %d", player.health),
+                width - 200,96);
     }
 
     @Override

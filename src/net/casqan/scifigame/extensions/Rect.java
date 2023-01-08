@@ -3,9 +3,6 @@ package net.casqan.scifigame.extensions;
 import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 
-import javax.sound.midi.Soundbank;
-import java.io.FilterOutputStream;
-
 public class Rect {
     Vertex position;
     Vertex dimensions;
@@ -46,7 +43,7 @@ public class Rect {
 
     public boolean touches(GameObj that){
         Vertex relative = Vertex.sub(pos(),that.pos());
-        System.out.println(relative.Magnitude());
+        System.out.println(relative.magnitude());
         System.out.println(relative);
         System.out.println("Above: " + isAbove(that) +
                 "| Underneath: " + isUnderneath(that) +

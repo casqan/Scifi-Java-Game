@@ -14,7 +14,7 @@ public interface Game{
 
   GameObj player();
 
-  HashMap<String, List<? extends GameObj>> goss();
+  HashMap<String, List<GameObj>> goss();
 
   void init();
 

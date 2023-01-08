@@ -1,19 +1,17 @@
-package net.casqan.scifigame.sprite;
+package net.casqan.scifigame.animations;
 
 import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.core.GameTime;
+import net.casqan.scifigame.sprite.SpriteSheet;
 
 import java.awt.*;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class Animation {
     SpriteSheet sheet;
     public int frameCount;
-    boolean looping;
     int framerate;
+    boolean looping;
     double time;
-    int index;
 
     public Event<Animation> onAnimationEnd = new Event<>();
 
@@ -21,11 +19,10 @@ public class Animation {
     }
     public Animation Play(){
         time = GameTime.Time();
-        index = 0;
         return this;
     }
 
-    Image GetFrame(int frame){
+    public Image GetFrame(int frame){
         return sheet.GetFrame(frame);
     }
 
@@ -33,7 +30,7 @@ public class Animation {
     //It's easier to work with a double that gives seconds and fractions of seconds
     //You could also offload this into a NonLoopingAnimation and then do this to
     //save on the if check, but again, I'm lazy
-    Image GetCurrentFrame(){
+    public Image GetCurrentFrame(){
         int frameIndex = (int)((GameTime.Time() - time) * framerate);
         if (!looping && frameIndex >= frameCount) onAnimationEnd.Invoke(this);
         return GetFrame(frameIndex % frameCount);
@@ -43,7 +40,7 @@ public class Animation {
         this.sheet = sheet;
         this.framerate = framerate;
         this.looping = looping;
-        this.frameCount = sheet.spriteCount;
+        this.frameCount = sheet.getSpriteCount();
     }
 
     public SpriteSheet getSheet() {

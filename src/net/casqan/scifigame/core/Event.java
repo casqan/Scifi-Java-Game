@@ -19,7 +19,12 @@ public class Event<T> {
     public void Invoke(T t){
         for (var listener:
              listeners) {
-            listener.accept(t);
+            try {
+                listener.accept(t);
+            }
+            catch (Exception e){
+                System.out.println(e);
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package net.casqan.scifigame.sprite;
+package net.casqan.scifigame.animations;
 
 public class EntityAction {
     public static final String IDLEPX = "IDLEPX";

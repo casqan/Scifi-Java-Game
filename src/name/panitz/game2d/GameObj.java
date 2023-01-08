@@ -23,6 +23,7 @@ public interface GameObj{
   default boolean isLeftOf(double x){return pos().x + anchor().x + width()<x;}
   default boolean isLeftOf(GameObj that){return isLeftOf(that.pos().x + that.anchor().x);}
   default boolean isRightOf(GameObj that){return that.isLeftOf(this);}
+  default void Colliding(){}
 
   default boolean touches(GameObj that){
     return 

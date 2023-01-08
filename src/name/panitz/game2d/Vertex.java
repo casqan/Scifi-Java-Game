@@ -4,7 +4,7 @@ public class Vertex {
 	public double x;
 	public double y;
 
-	public double Magnitude(){
+	public double magnitude(){
 		return Math.sqrt(x*x + y*y);
 	}
 
@@ -51,5 +51,13 @@ public class Vertex {
 	//It is used to smoothly move from one point to another
 	public static Vertex Lerp(Vertex a, Vertex b, double t){
 		return new Vertex(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+	}
+	public Vertex normalized(){
+		return new Vertex(this).mult(1d / this.magnitude());
+	}
+	public void Normalize(){
+		var n = this.normalized();
+		x = n.x;
+		y = n.y;
 	}
 }

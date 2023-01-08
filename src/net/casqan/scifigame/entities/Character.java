@@ -1,10 +1,10 @@
-package net.casqan.scifigame.sprite;
+package net.casqan.scifigame.entities;
 
 import name.panitz.game2d.Vertex;
-import net.casqan.scifigame.extensions.Rect;
+import net.casqan.scifigame.animations.Animation;
+import net.casqan.scifigame.animations.EntityAction;
 
 import java.util.HashMap;
-import java.util.Objects;
 
 public class Character extends Entity{
     public boolean attacking = false;
@@ -27,7 +27,7 @@ public class Character extends Entity{
     public void move(){
         if (attacking) return;
         super.move();
-        if (velocity.Magnitude() > 0){
+        if (velocity.magnitude() > 0){
             forward.x = velocity.x;
             forward.y = velocity.y;
             if (velocity().y > 0)       { if (!currentAction.equals(EntityAction.MOVEPY)) SetCurrentAction(EntityAction.MOVEPY); }
