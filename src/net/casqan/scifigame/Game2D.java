@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 import static java.awt.event.KeyEvent.*;
 
 public class Game2D implements Game{
-
     public static final String L_ENTITIES = "L_ENTITIES";
     public static final String L_STATICS = "L_STATICS";
 
@@ -37,7 +36,6 @@ public class Game2D implements Game{
     Character player;
     Camera camera;
     Font font;
-
     Vertex screen;
     public Vertex getScreen() {
         return screen;
@@ -54,7 +52,6 @@ public class Game2D implements Game{
 
     Game2D(int width, int height){
         instance = this;
-
         GameTime.Init();
         activeObjects = new HashMap<>();
         activeObjects.put(L_STATICS,new ArrayList<>());
@@ -67,7 +64,6 @@ public class Game2D implements Game{
     public void SetPlayer(Character player){
         this.player = player;
     }
-
 
     @Override
     public int width() {
@@ -124,6 +120,9 @@ public class Game2D implements Game{
         Animation playerattackny = new Animation(new SpriteSheet("sprites/player/attackpy.png",
                 playerSize,scale), 12,false);
 
+        Animation playerDeath = new Animation( new SpriteSheet("sprites/player/death.png",
+                playerSize,scale), 12,false);
+
         var playerAnimations = new HashMap<String,Animation>();
 
         playerAnimations.put(EntityAction.IDLEPX,playerIdlepx);
@@ -141,11 +140,13 @@ public class Game2D implements Game{
         playerAnimations.put(EntityAction.ATTACKPY,playerattackpy);
         playerAnimations.put(EntityAction.ATTACKNY,playerattackny);
 
+        playerAnimations.put(EntityAction.DEATH,playerDeath);
+
         Character _player = new Character(playerAnimations,new Vertex(0,0),
-                new Vertex(112,132),32,16,new Vertex(0,0),EntityAction.IDLEPX);
+                new Vertex(112,132),32,16,new Vertex(0,0),1,EntityAction.IDLEPX);
         _player.onDeath.Clear();
         _player.name = "player";
-        player.health = 200;
+        _player.health = 200;
         SetPlayer(_player);
 
         camera = new Camera();
@@ -156,6 +157,7 @@ public class Game2D implements Game{
         playerattackpy.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
         playerattackny.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
 
+        //Input Setup
         InputManager.RegisterOnKeyDown(VK_W,(key) -> player().velocity().add(new Vertex(0,-2)));
         InputManager.RegisterOnKeyUp(VK_W,(key) -> player().velocity().add(new Vertex(0,2)));
 
@@ -207,17 +209,47 @@ public class Game2D implements Game{
                 if (go == player) continue;
                 System.out.println(go instanceof Entity);
                 if (!(go instanceof Entity)) continue;
-                ((Entity)go).DealDamage(20);
+                ((Entity)go).DealDamage(10);
             }
             System.gc();
             System.out.println("====================================");
         });
 
-        Enemy enemy = new Enemy(playerAnimations,new Vertex(1000,600),
-                new Vertex(112,132),32,16,new Vertex(0,0),EntityAction.IDLEPX);
-        enemy.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
-        enemy.maxHealth = 20;
+        var slimeAnimations = new HashMap<String,Animation>();
+        var slimeSize = new VertexInt(16,16);
+        Animation slimeIdle = new Animation(new SpriteSheet("sprites/slime/slimeidle.png",
+                slimeSize,scale), 8,true);
+        Animation slimeMove = new Animation(new SpriteSheet("sprites/slime/slimewalk.png",
+                slimeSize,scale), 8,true);
 
+        slimeAnimations.put(EntityAction.IDLEPX,slimeIdle);
+        slimeAnimations.put(EntityAction.IDLENX,slimeIdle);
+        slimeAnimations.put(EntityAction.IDLEPY,slimeIdle);
+        slimeAnimations.put(EntityAction.IDLENY,slimeIdle);
+
+        slimeAnimations.put(EntityAction.MOVEPX,slimeMove);
+        slimeAnimations.put(EntityAction.MOVENX,slimeMove);
+        slimeAnimations.put(EntityAction.MOVEPY,slimeMove);
+        slimeAnimations.put(EntityAction.MOVENY,slimeMove);
+
+        slimeAnimations.put(EntityAction.ATTACKPX,slimeMove);
+        slimeAnimations.put(EntityAction.ATTACKNX,slimeMove);
+        slimeAnimations.put(EntityAction.ATTACKPY,slimeMove);
+        slimeAnimations.put(EntityAction.ATTACKNY,slimeMove);
+
+        slimeAnimations.put(EntityAction.DEATH,slimeIdle);
+
+        //Create Enemy Prefab
+        Enemy slime = new Enemy(slimeAnimations,new Vertex(0,0),
+                new Vertex(8,40),52,16,new Vertex(0,0),1.5f,EntityAction.IDLEPX);
+        //slime.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
+        slime.maxHealth = 20;
+
+        Enemy player2 = new Enemy(playerAnimations,new Vertex(0,0),
+                new Vertex(112,132),32,16,new Vertex(0,0),1.5f,EntityAction.IDLEPX);
+        player2.maxHealth = 20;
+
+        //Setup Merchant
         Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/idle.png",
                 new VertexInt(64,64),3),10,true);
         Animation merchantDeath = new Animation(new SpriteSheet("sprites/merchant/walk.png",
@@ -226,25 +258,26 @@ public class Game2D implements Game{
         merchantAnimations.put(EntityAction.IDLEPX,merchantIdle);
         merchantAnimations.put(EntityAction.DEATH,merchantDeath);
         Entity merchant = new Entity(merchantAnimations,new Vertex(200,0),
-                new Vertex(60,134),50,6,new Vertex(0,0),EntityAction.IDLEPX);
+                new Vertex(60,134),50,6,new Vertex(0,0),2,EntityAction.IDLEPX);
         merchant.name = "merchant";
 
+        //Spawn Enemies
         var list = new ArrayList<GameObj>();
         list.add(merchant);
         list.add(player);
         //list.add(enemy);
-        for (int i = 0; i < 10; i++){
+        for (int i = 0; i < 5; i++){
             var pos = new Vertex(.5f - Math.random(), .5f - Math.random());
             pos.Normalize();
-            Enemy instance = new Enemy(enemy,pos.mult(400));
+            Enemy instance = new Enemy(player2,pos.mult(500));
             instance.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
             list.add(instance);
         }
-        //list.add(damageRect);
+
         goss().put(L_ENTITIES, list);
         try{
             InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavtt.ttf");
-            font = Font.createFont(Font.TRUETYPE_FONT,in).deriveFont(20f);
+            font = Font.createFont(Font.TRUETYPE_FONT,in).deriveFont(15f);
 
         } catch (Exception e){
             System.out.println("Could not load font, reverting to default.");
@@ -268,21 +301,17 @@ public class Game2D implements Game{
         for (GameObj go : collidingWithPlayer){
             go.Colliding();
             go.pos().add(new Vertex(-go.velocity().x,-go.velocity().y));
+            if (player.attacking) continue;
             go.pos().add(new Vertex(player().velocity().x,player().velocity().y));
         }
-
         collidingWithPlayer.clear();
     }
 
     @Override
-    public void doChecks() {
-
-    }
+    public void doChecks() { }
 
     @Override
-    public void keyTypedReaction(KeyEvent keyEvent) {
-
-    }
+    public void keyTypedReaction(KeyEvent keyEvent) { }
 
     @Override
     public void keyPressedReaction(KeyEvent keyEvent) {
@@ -355,6 +384,13 @@ public class Game2D implements Game{
                 width - 200,80);
         g.drawString(String.format("Health: %d", player.health),
                 width - 200,96);
+        g.drawString(String.format("Entities: "),
+                0,0);
+        for(int i = 0; i < goss().get(L_ENTITIES).size(); i++){
+            var o = goss().get(L_ENTITIES).get(i);
+            g.drawString(String.format(o.name() + "|" + String.format("x:%.2f",o.pos().x) +
+                    " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 1));
+        }
     }
 
     @Override

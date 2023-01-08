@@ -13,21 +13,29 @@ public class Enemy extends Character{
     public double attackTime;
     public int damage = 5;
 
-    public Enemy(HashMap<String, Animation> animations, Vertex pos, Vertex anchor, int width, int height, Vertex velocity, String currentAction) {
-        super(animations, pos, anchor, width, height, velocity, currentAction);
+    public Enemy(HashMap<String, Animation> animations, Vertex pos, Vertex anchor, int width, int height, Vertex velocity,float speed, String currentAction) {
+        super(animations, pos, anchor, width, height, velocity,speed, currentAction);
     }
     public Enemy(Enemy og, Vertex pos){
-        super(og.animations, pos, og.anchor, og.width, og.height, og.velocity, og.currentAction);
+        super(og.animations, pos, og.anchor, og.width, og.height, og.velocity, og.speed, og.currentAction);
         this.maxHealth = og.maxHealth;
         this.health = og.maxHealth;
         this.onDeath = og.onDeath;
         this.damage = og.damage;
     }
+    @Override
+    public void Attack(){
+        if (forward().x > 0 && (!currentAction.equals(EntityAction.ATTACKPX))) SetCurrentAction(EntityAction.ATTACKPX);
+        if (forward().x < 0 && (!currentAction.equals(EntityAction.ATTACKNX))) SetCurrentAction(EntityAction.ATTACKNX);
+        if (forward().y > 0 && (!currentAction.equals(EntityAction.ATTACKPY))) SetCurrentAction(EntityAction.ATTACKPY);
+        if (forward().y < 0 && (!currentAction.equals(EntityAction.ATTACKNY))) SetCurrentAction(EntityAction.ATTACKNY);
+    }
 
     @Override
     public void move() {
         super.move();
-        var v = Vertex.sub(Game2D.getInstance().player().pos,pos);
+        var player = Game2D.getInstance().player();
+        var v = Vertex.sub(Vertex.add(player.pos(),player.anchor()),Vertex.add(pos(),anchor()));
         v = v.mult(1d / v.magnitude());
         velocity = v;
     }
@@ -36,6 +44,7 @@ public class Enemy extends Character{
     public void Colliding() {
         super.Colliding();
         if (attackTime > GameTime.Time()) return;
+        Attack();
         attackTime = GameTime.Time() + attackDelay;
         Game2D.getInstance().player().DealDamage(damage);
     }

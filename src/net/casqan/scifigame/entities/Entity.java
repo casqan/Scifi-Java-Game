@@ -21,6 +21,7 @@ public class Entity extends AbstractGameObj implements Cloneable{
     public int width;
     public int maxHealth;
     public int health;
+    public float speed;
 
     public Event<Entity> onDeath = new Event<>();
 
@@ -37,7 +38,7 @@ public class Entity extends AbstractGameObj implements Cloneable{
         animations = new HashMap<>();
     }
     public Entity(HashMap<String,Animation> animations, Vertex pos, Vertex anchor, int width, int height,
-                  Vertex velocity,String currentAction){
+                  Vertex velocity,float speed,String currentAction){
 
         super(pos,velocity,animations.get(currentAction).getSheet().getScaled().x,
                 animations.get(currentAction).getSheet().getScaled().y);
