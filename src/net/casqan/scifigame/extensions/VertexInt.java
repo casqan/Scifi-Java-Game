@@ -11,6 +11,10 @@ public class VertexInt {
         this.y = y;
     }
 
+    public static VertexInt Add(VertexInt position, VertexInt pos) {
+        return new VertexInt(position.x + pos.x, position.y + pos.y);
+    }
+
     public void add(Vertex that) {
         x += that.x;
         y += that.y;
