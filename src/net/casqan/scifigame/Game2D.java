@@ -10,6 +10,8 @@ import net.casqan.scifigame.entities.Entity;
 import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
+import net.casqan.scifigame.generation.Dungeon;
+import net.casqan.scifigame.generation.Room;
 import net.casqan.scifigame.gizmos.Gizmo;
 import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
@@ -45,6 +47,7 @@ public class Game2D implements Game{
     public static Game2D getInstance() {
         return instance;
     }
+    int seed = 0;
 
     final Color backgroundColor = new Color(0.17f,0.17f,0.17f);
     HashMap<String,List<GameObj>> activeObjects;
@@ -205,7 +208,7 @@ public class Game2D implements Game{
 
 
             var r = new Rect(pos,size);
-            Gizmos.Add(new Gizmo(r,Color.red));
+            //Gizmos.Add(new Gizmo(r,Color.red));
             var col = Physics.OverlapRect(r,damageLayers);
             for (var go : col){
                 System.out.println("Overlap with: " + go.name());
@@ -274,17 +277,17 @@ public class Game2D implements Game{
         });
 
         goss().put(L_ENTITIES, list);
-        for (int i = 0; i < 5; i++) SpawnEnemy(player2);
+        //for (int i = 0; i < 5; i++) SpawnEnemy(player2);
 
         //Build Map
         var Tileset = new Tileset("sprites/tileset/tileset.png",32,32);
         var tiles = new String[][] {
                 new String[] {"0;1","0;3","0;2","0;0"},
                 new String[] {"0;0","0;0","0;0","1;0"},
-                new String[] {"0;0","0;0","0;0","0;0"},
-                new String[] {"0;0","0;0","0;0","0;0"},
+                new String[] {"0;0","7;0","0;6","0;0"},
+                new String[] {"0;0","6;0","0;7","0;0"},
         } ;
-        var TileMap = new Tilemap(Tileset,tiles,4);
+        var TileMap = new Tilemap(Tileset,tiles,2);
         var environment = new Environment(TileMap,new Vertex(0,0));
         List<GameObj> env = new ArrayList<>();
         env.add(environment);
@@ -297,6 +300,40 @@ public class Game2D implements Game{
         } catch (Exception e){
             System.out.println("Could not load font, reverting to default.");
             System.out.println(e);
+        }
+        InputManager.RegisterOnKeyDown(VK_TAB, var -> {
+            Gizmos.Clear();
+            seed++;
+        });
+
+        Dungeon dungeon = Dungeon.Generate(12758,8,8,30,15);
+        CreateDungeonGizmos(dungeon);
+    }
+
+    public void CreateDungeonGizmos(Dungeon dungeon){
+        int roomSize = 64;
+        for(int i = 0; i < dungeon.nodes.size(); i++){
+            var room = dungeon.nodes.get(i);
+            var r = new Rect(room.data.position.mult(roomSize),new Vertex(1,1).mult(roomSize));
+            Gizmos.Add(new Gizmo(r,new Color(0,(255 / dungeon.nodes.size()) * i,255),false));
+            if(room.parent == null) continue;
+            Vertex dir = Vertex.sub(room.parent.data.position.mult(roomSize),
+                    room.data.position.mult(roomSize));
+            Rect c;
+            if (dir.y < 0 || dir.x < 0){
+                dir.x = Math.abs(dir.x);
+                dir.y = Math.abs(dir.y);
+                c = new Rect(
+                        Vertex.add(room.parent.data.position.mult(roomSize),
+                                new Vertex(roomSize / 2,roomSize / 2)),
+                        dir);
+            }else {
+                c = new Rect(
+                        Vertex.add(room.data.position.mult(roomSize),
+                                new Vertex(roomSize / 2,roomSize / 2)),
+                        dir);
+            }
+            Gizmos.Add(new Gizmo(c,Color.green));
         }
     }
 
