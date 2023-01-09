@@ -27,4 +27,10 @@ public class VertexInt {
     public VertexInt multInt(double d) {
         return new VertexInt((int)(d * x), (int)(d * y));
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof VertexInt instance)) return false;
+        return instance.x == x && instance.y == y;
+    }
 }
