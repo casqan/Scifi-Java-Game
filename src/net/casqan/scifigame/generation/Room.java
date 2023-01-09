@@ -5,7 +5,6 @@ import net.casqan.scifigame.tilesystem.Tilemap;
 import net.casqan.scifigame.tilesystem.Tileset;
 
 public class Room {
-    VertexInt position;
-    Tilemap tilemap;
-
+    public VertexInt position;
+    public Tilemap tilemap;
 }
