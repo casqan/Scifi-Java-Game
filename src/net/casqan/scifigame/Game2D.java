@@ -20,6 +20,7 @@ import net.casqan.scifigame.entities.Character;
 import net.casqan.scifigame.tilesystem.Environment;
 import net.casqan.scifigame.tilesystem.Tilemap;
 import net.casqan.scifigame.tilesystem.Tileset;
+import net.casqan.scifigame.tilesystem.Wall;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -32,6 +33,7 @@ import static java.awt.event.KeyEvent.*;
 
 public class Game2D implements Game{
     public static final String L_ENTITIES = "L_ENTITIES";
+    public static final String L_ENVIRONMENT = "L_ENV";
     public static final String L_STATICS = "L_STATICS";
 
     int width;
@@ -290,7 +292,7 @@ public class Game2D implements Game{
         //var environment = new Environment(TileMap,new Vertex(0,0));
         List<GameObj> env = new ArrayList<>();
         //env.add(environment);
-        goss().put(L_STATICS,env);
+        goss().put(L_ENVIRONMENT,env);
 
         try{
             InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavtt.ttf");
@@ -305,55 +307,40 @@ public class Game2D implements Game{
             seed = new Random().nextInt();
             Dungeon dungeon = Dungeon.Generate(seed,4,2,10,6,
                     16,16,0,dungeonTileset);
-            activeObjects.get(L_STATICS).clear();
+            activeObjects.get(L_ENVIRONMENT).clear();
             int offset = 0;
             for (var node : dungeon.nodes){
-                node.data.BuildRoom(12,12,seed + offset,dungeonTileset);
-                activeObjects.get(L_STATICS).add(node.data.environment);
+                node.data.BuildRoom(12,12,seed + offset,dungeonTileset,0);
+                activeObjects.get(L_ENVIRONMENT).add(node.data.environment);
+                for(GameObj w : node.data.walls){
+                    activeObjects.get(L_STATICS).add(w);
+                }
                 offset++;
             }
-            CreateDungeonGizmos(dungeon);
+            Dungeon.CreateDungeonGizmos(dungeon);
         });
 
         Dungeon dungeon = Dungeon.Generate(seed,1,1,5,5,
                 16,16,0,dungeonTileset);
-        CreateDungeonGizmos(dungeon);
+        Dungeon.CreateDungeonGizmos(dungeon);
 
         int offset = 0;
         for (var node : dungeon.nodes){
-            node.data.BuildRoom(12,12,seed + offset,dungeonTileset);
-            activeObjects.get(L_STATICS).add(node.data.environment);
+            node.data.BuildRoom(12,12,seed + offset,dungeonTileset,0);
+            activeObjects.get(L_ENVIRONMENT).add(node.data.environment);
+            for(GameObj w : node.data.walls){
+                activeObjects.get(L_STATICS).add(w);
+                System.out.println(activeObjects.get(L_STATICS).size());
+                System.out.println(w.pos());
+                System.out.println(w.width());
+                System.out.println(w.height());
+
+            }
             offset++;
         }
-    }
 
-    public void CreateDungeonGizmos(Dungeon dungeon){
-        int roomSize = 12 * 32 * 2;
-        for(int i = 0; i < dungeon.nodes.size(); i++){
-            var room = dungeon.nodes.get(i);
-
-            var r = new Rect(room.data.position.mult(roomSize),new Vertex(1,1).mult(roomSize));
-
-            Gizmos.Add(new Gizmo(r,new Color((255 / dungeon.nodes.size()) * i,255 - ((255 / dungeon.nodes.size()) * i),0),false));
-            if(room.parent == null) continue;
-            Vertex dir = Vertex.sub(room.parent.data.position.mult(roomSize),
-                    room.data.position.mult(roomSize));
-            Rect c;
-            if (dir.y < 0 || dir.x < 0){
-                dir.x = Math.abs(dir.x);
-                dir.y = Math.abs(dir.y);
-                c = new Rect(
-                        Vertex.add(room.parent.data.position.mult(roomSize),
-                                new Vertex(roomSize / 2,roomSize / 2)),
-                        dir);
-            }else {
-                c = new Rect(
-                        Vertex.add(room.data.position.mult(roomSize),
-                                new Vertex(roomSize / 2,roomSize / 2)),
-                        dir);
-            }
-            Gizmos.Add(new Gizmo(c,Color.blue));
-        }
+        Wall wall = new Wall(new Vertex(0, 0), 64, 64, null);
+        activeObjects.get(L_STATICS).add(wall);
     }
 
     public void SpawnEnemy(Enemy enemy){
@@ -365,24 +352,28 @@ public class Game2D implements Game{
     }
     @Override
     public void move() {
-        player.move();
         camera.pos = Vertex.Lerp(camera.pos,Vertex.add(player.pos,player.anchor),GameTime.DeltaTime() * 5);
         for (GameObj go : goss().get(L_ENTITIES)) {
-            if (go == player) continue;
-            if (go.touches(player)) collidingWithPlayer.add(go);
             go.move();
+            if (go != player && go.touches(player)) go.onCollision(player);
+            for(var gostat : goss().get(L_STATICS)){
+                if (go.touches(gostat)) {
+                    go.onCollision(gostat);
+                    //gostat.onCollision(go);
+                }
+            }
         }
 
-        if(collidingWithPlayer.size() == 0)  return;
+        /*if(collidingWithPlayer.size() == 0)  return;
         //Get Vertex of Player pos and colliding Object pos
         //move Object away from Player
         for (GameObj go : collidingWithPlayer){
-            go.Colliding();
+            go.onCollision(player);
             go.pos().add(new Vertex(-go.velocity().x,-go.velocity().y));
             if (player.attacking) continue;
             go.pos().add(new Vertex(player().velocity().x,player().velocity().y));
         }
-        collidingWithPlayer.clear();
+        collidingWithPlayer.clear();*/
     }
 
     @Override
@@ -433,6 +424,7 @@ public class Game2D implements Game{
                 .collect(Collectors.toList()));                      //Convert back to List
 
         //Draw all StaticObjects
+        for (var go : goss().get(L_ENVIRONMENT)) go.paintTo(g);
         for (var go : goss().get(L_STATICS)) go.paintTo(g);
         for (var go : goss().get(L_ENTITIES))
             try { go.paintTo(g); }

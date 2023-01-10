@@ -1,8 +1,13 @@
 package net.casqan.scifigame.generation;
 
+import name.panitz.game2d.Vertex;
+import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
+import net.casqan.scifigame.gizmos.Gizmo;
+import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.tilesystem.Tileset;
 
+import java.awt.*;
 import java.util.Objects;
 import java.util.Random;
 
@@ -105,6 +110,35 @@ public class Dungeon extends Graph<Room> {
                 return new VertexInt(0,-1);
             default:
                 return new VertexInt(0,0);
+        }
+    }
+
+    public static void CreateDungeonGizmos(Dungeon dungeon){
+        int roomSize = 12 * 32 * 2;
+        for(int i = 0; i < dungeon.nodes.size(); i++){
+            var room = dungeon.nodes.get(i);
+
+            var r = new Rect(room.data.position.mult(roomSize),new Vertex(1,1).mult(roomSize));
+
+            Gizmos.Add(new Gizmo(r,new Color((255 / dungeon.nodes.size()) * i,255 - ((255 / dungeon.nodes.size()) * i),0),false));
+            if(room.parent == null) continue;
+            Vertex dir = Vertex.sub(room.parent.data.position.mult(roomSize),
+                    room.data.position.mult(roomSize));
+            Rect c;
+            if (dir.y < 0 || dir.x < 0){
+                dir.x = Math.abs(dir.x);
+                dir.y = Math.abs(dir.y);
+                c = new Rect(
+                        Vertex.add(room.parent.data.position.mult(roomSize),
+                                new Vertex(roomSize / 2,roomSize / 2)),
+                        dir);
+            }else {
+                c = new Rect(
+                        Vertex.add(room.data.position.mult(roomSize),
+                                new Vertex(roomSize / 2,roomSize / 2)),
+                        dir);
+            }
+            Gizmos.Add(new Gizmo(c,Color.blue));
         }
     }
 }

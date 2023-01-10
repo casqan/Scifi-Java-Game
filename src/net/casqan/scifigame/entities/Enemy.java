@@ -1,5 +1,6 @@
 package net.casqan.scifigame.entities;
 
+import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.animations.EntityAction;
@@ -33,16 +34,17 @@ public class Enemy extends Character{
 
     @Override
     public void move() {
-        super.move();
         var player = Game2D.getInstance().player();
         var v = Vertex.sub(Vertex.add(player.pos(),player.anchor()),Vertex.add(pos(),anchor()));
         v = v.mult(1d / v.magnitude());
         velocity = v;
+        super.move();
     }
 
     @Override
-    public void Colliding() {
-        super.Colliding();
+    public void onCollision(GameObj other) {
+        super.onCollision(other);
+        if (other != Game2D.getInstance().player()) return;
         if (attackTime > GameTime.Time()) return;
         Attack();
         attackTime = GameTime.Time() + attackDelay;

@@ -1,6 +1,7 @@
 package net.casqan.scifigame.entities;
 
 import name.panitz.game2d.AbstractGameObj;
+import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.core.*;
@@ -112,6 +113,12 @@ public class Entity extends AbstractGameObj implements Cloneable{
         SetCurrentAction(EntityAction.DEATH);
         animations.get(EntityAction.DEATH).onAnimationEnd.AddListener(
                 (var) -> Game2D.getInstance().goss().get(Game2D.L_ENTITIES).remove(this));
+    }
+
+    @Override
+    public void onCollision(GameObj that) {
+        super.onCollision(that);
+        pos().add(velocity.mult(-1));
     }
 
     @Override
