@@ -8,6 +8,8 @@ import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.tilesystem.Tileset;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
@@ -112,6 +114,13 @@ public class Dungeon extends Graph<Room> {
                 return new VertexInt(0,0);
         }
     }
+    public static int GetDirection(VertexInt dir) {
+        if (dir.x == 1 && dir.y == 0) return 1;
+        if (dir.x == 0 && dir.y == 1) return 2;
+        if (dir.x == -1 && dir.y == 0) return 4;
+        if (dir.x == 0 && dir.y == -1) return 8;
+        return 0;
+    }
 
     public static void CreateDungeonGizmos(Dungeon dungeon){
         int roomSize = 12 * 32 * 2;
@@ -120,7 +129,8 @@ public class Dungeon extends Graph<Room> {
 
             var r = new Rect(room.data.position.mult(roomSize),new Vertex(1,1).mult(roomSize));
 
-            Gizmos.Add(new Gizmo(r,new Color((255 / dungeon.nodes.size()) * i,255 - ((255 / dungeon.nodes.size()) * i),0),false));
+            Gizmos.Add(new Gizmo(r,new Color((255 / dungeon.nodes.size()) * i,
+                    255 - ((255 / dungeon.nodes.size()) * i),0),false));
             if(room.parent == null) continue;
             Vertex dir = Vertex.sub(room.parent.data.position.mult(roomSize),
                     room.data.position.mult(roomSize));
@@ -138,7 +148,22 @@ public class Dungeon extends Graph<Room> {
                                 new Vertex(roomSize / 2,roomSize / 2)),
                         dir);
             }
-            Gizmos.Add(new Gizmo(c,Color.blue));
+            Gizmos.Add(new Gizmo(c, Color.blue));
         }
+    }
+
+    public static List<VertexInt> GetOpenDirections(Node<Room> node) {
+        List<VertexInt> dirs = new ArrayList<>();
+        if (node.parent != null) dirs.add(GetOpenDirections(node, node.parent));
+        for (Node<Room> child : node.children) {
+            dirs.add(GetOpenDirections(node, child));
+        }
+        return dirs;
+    }
+    public static VertexInt GetOpenDirections(Node<Room> node, Node<Room> other) {
+        VertexInt dir = VertexInt.Sub(other.data.position, node.data.position);
+        if (dir.y != 0 )dir.y /= Math.abs(dir.y);
+        if (dir.x != 0 )dir.x /= Math.abs(dir.x);
+        return dir;
     }
 }

@@ -49,7 +49,7 @@ public class Game2D implements Game{
     public static Game2D getInstance() {
         return instance;
     }
-    int seed = 0;
+    public int seed = 0;
 
     final Color backgroundColor = new Color(0.17f,0.17f,0.17f);
     HashMap<String,List<GameObj>> activeObjects;
@@ -308,9 +308,12 @@ public class Game2D implements Game{
             Dungeon dungeon = Dungeon.Generate(seed,4,2,10,6,
                     16,16,0,dungeonTileset);
             activeObjects.get(L_ENVIRONMENT).clear();
+            activeObjects.get(L_STATICS).clear();
+            player.pos = new Vertex(0,0);
             int offset = 0;
             for (var node : dungeon.nodes){
-                node.data.BuildRoom(12,12,seed + offset,dungeonTileset,0);
+                node.data.BuildRoom(12,12,seed + offset,
+                        dungeonTileset,Dungeon.GetOpenDirections(node));
                 activeObjects.get(L_ENVIRONMENT).add(node.data.environment);
                 for(GameObj w : node.data.walls){
                     activeObjects.get(L_STATICS).add(w);
@@ -326,15 +329,10 @@ public class Game2D implements Game{
 
         int offset = 0;
         for (var node : dungeon.nodes){
-            node.data.BuildRoom(12,12,seed + offset,dungeonTileset,0);
+            node.data.BuildRoom(12,12,seed + offset,dungeonTileset,Dungeon.GetOpenDirections(node));
             activeObjects.get(L_ENVIRONMENT).add(node.data.environment);
             for(GameObj w : node.data.walls){
                 activeObjects.get(L_STATICS).add(w);
-                System.out.println(activeObjects.get(L_STATICS).size());
-                System.out.println(w.pos());
-                System.out.println(w.width());
-                System.out.println(w.height());
-
             }
             offset++;
         }
@@ -413,7 +411,7 @@ public class Game2D implements Game{
         GameTime.Update();
 
         //Draw Background
-        g.setColor(backgroundColor);
+        g.setColor(Color.black);
         g.fillRect(0,0,width,height);
         g.setColor(Color.white);
 
