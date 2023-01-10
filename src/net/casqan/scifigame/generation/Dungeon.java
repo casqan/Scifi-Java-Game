@@ -1,6 +1,7 @@
 package net.casqan.scifigame.generation;
 
 import net.casqan.scifigame.extensions.VertexInt;
+import net.casqan.scifigame.tilesystem.Tileset;
 
 import java.util.Objects;
 import java.util.Random;
@@ -20,8 +21,9 @@ public class Dungeon extends Graph<Room> {
     //Take a random room and step forward in any direction
     //If the room is not occupied, place it
     //Do this for a random amount of branches.
-    public static Dungeon Generate(long seed, int maxBranches, int minBranches, int maxBranchDepth, int minBranchDepth){
-        Dungeon dungeon = new Dungeon(new Room());
+    public static Dungeon Generate(long seed, int maxBranches, int minBranches, int maxBranchDepth, int minBranchDepth,
+                                   int roomWidth, int roomHeight, int roomSpacing, Tileset tileset){
+        Dungeon dungeon = new Dungeon(new Room(new VertexInt(0,0)));
         dungeon.Root().data.position = new VertexInt(0,0);
         random = new Random();
         random.setSeed(seed);
@@ -74,7 +76,6 @@ public class Dungeon extends Graph<Room> {
         }
         System.out.println("Dir " + dir);
         System.out.println("Searched " + searched);
-        var room = new Room();
         boolean occupied = true;
         try{
             occupied = dungeon.nodes.stream().anyMatch(
@@ -89,8 +90,7 @@ public class Dungeon extends Graph<Room> {
         if(occupied){
             return BuildRoom(dungeon, node, searched + dir);
         }
-        room.position = VertexInt.Add(node.data.position,GetDirection(dir));
-        return room;
+        return new Room(VertexInt.Add(node.data.position,GetDirection(dir)));
     }
 
     public static VertexInt GetDirection(int dir){

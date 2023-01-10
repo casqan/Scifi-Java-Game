@@ -53,9 +53,12 @@ public class Game2D implements Game{
     HashMap<String,List<GameObj>> activeObjects;
     Set<String> damageLayers;
     List<GameObj> collidingWithPlayer = new ArrayList<>();
+    private static Random random;
+    public static Random Random() {return random;}
+    public Tileset dungeonTileset;
     //EmptyGameObj damageRect;
 
-    Game2D(int width, int height){
+    Game2D(int width, int height, int seed){
         instance = this;
         GameTime.Init();
         activeObjects = new HashMap<>();
@@ -64,6 +67,8 @@ public class Game2D implements Game{
         this.width = width;
         this.height = height;
         screen = new Vertex(width/2f,height/2f);
+        this.seed = seed;
+        random = new Random(seed);
     }
 
     public void SetPlayer(Character player){
@@ -280,17 +285,11 @@ public class Game2D implements Game{
         //for (int i = 0; i < 5; i++) SpawnEnemy(player2);
 
         //Build Map
-        var Tileset = new Tileset("sprites/tileset/tileset.png",32,32);
-        var tiles = new String[][] {
-                new String[] {"0;1","0;3","0;2","0;0"},
-                new String[] {"0;0","0;0","0;0","1;0"},
-                new String[] {"0;0","7;0","0;6","0;0"},
-                new String[] {"0;0","6;0","0;7","0;0"},
-        } ;
-        var TileMap = new Tilemap(Tileset,tiles,2);
-        var environment = new Environment(TileMap,new Vertex(0,0));
+        dungeonTileset = new Tileset("sprites/tileset/dungeontiles.png",16,16);
+        //var TileMap = new Tilemap(dungeonTileset,tiles,1);
+        //var environment = new Environment(TileMap,new Vertex(0,0));
         List<GameObj> env = new ArrayList<>();
-        env.add(environment);
+        //env.add(environment);
         goss().put(L_STATICS,env);
 
         try{
@@ -301,21 +300,41 @@ public class Game2D implements Game{
             System.out.println("Could not load font, reverting to default.");
             System.out.println(e);
         }
-        InputManager.RegisterOnKeyDown(VK_TAB, var -> {
+        InputManager.RegisterOnKeyDown(VK_T, var -> {
             Gizmos.Clear();
-            seed++;
+            seed = new Random().nextInt();
+            Dungeon dungeon = Dungeon.Generate(seed,4,2,10,6,
+                    16,16,0,dungeonTileset);
+            activeObjects.get(L_STATICS).clear();
+            int offset = 0;
+            for (var node : dungeon.nodes){
+                node.data.BuildRoom(12,12,seed + offset,dungeonTileset);
+                activeObjects.get(L_STATICS).add(node.data.environment);
+                offset++;
+            }
+            CreateDungeonGizmos(dungeon);
         });
 
-        Dungeon dungeon = Dungeon.Generate(12758,8,8,30,15);
+        Dungeon dungeon = Dungeon.Generate(seed,1,1,5,5,
+                16,16,0,dungeonTileset);
         CreateDungeonGizmos(dungeon);
+
+        int offset = 0;
+        for (var node : dungeon.nodes){
+            node.data.BuildRoom(12,12,seed + offset,dungeonTileset);
+            activeObjects.get(L_STATICS).add(node.data.environment);
+            offset++;
+        }
     }
 
     public void CreateDungeonGizmos(Dungeon dungeon){
-        int roomSize = 64;
+        int roomSize = 12 * 32 * 2;
         for(int i = 0; i < dungeon.nodes.size(); i++){
             var room = dungeon.nodes.get(i);
+
             var r = new Rect(room.data.position.mult(roomSize),new Vertex(1,1).mult(roomSize));
-            Gizmos.Add(new Gizmo(r,new Color(0,(255 / dungeon.nodes.size()) * i,255),false));
+
+            Gizmos.Add(new Gizmo(r,new Color((255 / dungeon.nodes.size()) * i,255 - ((255 / dungeon.nodes.size()) * i),0),false));
             if(room.parent == null) continue;
             Vertex dir = Vertex.sub(room.parent.data.position.mult(roomSize),
                     room.data.position.mult(roomSize));
@@ -333,7 +352,7 @@ public class Game2D implements Game{
                                 new Vertex(roomSize / 2,roomSize / 2)),
                         dir);
             }
-            Gizmos.Add(new Gizmo(c,Color.green));
+            Gizmos.Add(new Gizmo(c,Color.blue));
         }
     }
 
@@ -450,6 +469,8 @@ public class Game2D implements Game{
             g.drawString(String.format(o.name() + "|" + String.format("x:%.2f",o.pos().x) +
                     " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 2));
         }
+        g.drawString(String.format("Seed: " + seed),
+                0,height - 16);
     }
 
     @Override

@@ -11,8 +11,8 @@ import java.util.HashMap;
 public class Tileset {
 
     Image sheet;
-    int tileWidth;
-    int tileHeight;
+    public int tileWidth;
+    public int tileHeight;
     public HashMap<String,Tile> tiles = new HashMap<>();
 
     public Tileset(){}
