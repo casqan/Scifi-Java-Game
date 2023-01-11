@@ -1,14 +1,20 @@
 package name.panitz.game2d;
+import net.casqan.scifigame.input.InputManager;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.awt.*;
-public class SwingScreen extends JPanel{
+
+import static java.awt.event.KeyEvent.VK_F11;
+
+public class SwingScreen extends JPanel implements ComponentListener{
   private static final long serialVersionUID = 1403492898373497054L;
   Game logic;
   Timer t;
 
   public SwingScreen(Game gl) {
     this.logic = gl;
+    this.addComponentListener(this);
 
     t = new Timer(13, (ev)->{
         logic.move();
@@ -35,8 +41,8 @@ public class SwingScreen extends JPanel{
           logic.keyPressedReaction(e);
         }
       });
-    setFocusable(true);
-    requestFocus();
+      setFocusable(true);
+      requestFocus();
     }
 
 	
@@ -49,5 +55,26 @@ public class SwingScreen extends JPanel{
     super.paintComponent(g);
     logic.paintTo(g);
   }
+
+    @Override
+    public void componentResized(ComponentEvent e) {
+        logic.width(e.getComponent().getWidth());
+        logic.height(e.getComponent().getHeight());
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+
+    }
 }
 

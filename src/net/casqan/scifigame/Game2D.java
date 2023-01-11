@@ -86,6 +86,17 @@ public class Game2D implements Game{
     public int height() {
         return height;
     }
+    @Override
+    public void width(int width){
+        this.width = width;
+        screen.x = width / 2;
+    }
+
+    @Override
+    public void height(int height) {
+        this.height = height;
+        screen.y = height / 2;
+    }
 
     @Override
     public Character player() {
@@ -287,7 +298,7 @@ public class Game2D implements Game{
         //for (int i = 0; i < 5; i++) SpawnEnemy(player2);
 
         //Build Map
-        dungeonTileset = new Tileset("sprites/tileset/dungeontiles.png",16,16);
+        dungeonTileset = new Tileset("sprites/tileset/tileset.png",16,16);
         //var TileMap = new Tilemap(dungeonTileset,tiles,1);
         //var environment = new Environment(TileMap,new Vertex(0,0));
         List<GameObj> env = new ArrayList<>();
@@ -302,43 +313,30 @@ public class Game2D implements Game{
             System.out.println("Could not load font, reverting to default.");
             System.out.println(e);
         }
-        InputManager.RegisterOnKeyDown(VK_T, var -> {
-            Gizmos.Clear();
-            seed = new Random().nextInt();
-            Dungeon dungeon = Dungeon.Generate(seed,4,2,10,6,
-                    16,16,0,dungeonTileset);
-            activeObjects.get(L_ENVIRONMENT).clear();
-            activeObjects.get(L_STATICS).clear();
-            player.pos = new Vertex(0,0);
-            int offset = 0;
-            for (var node : dungeon.nodes){
-                node.data.BuildRoom(12,12,seed + offset,
-                        dungeonTileset,Dungeon.GetOpenDirections(node));
-                activeObjects.get(L_ENVIRONMENT).add(node.data.environment);
-                for(GameObj w : node.data.walls){
-                    activeObjects.get(L_STATICS).add(w);
-                }
-                offset++;
-            }
-            Dungeon.CreateDungeonGizmos(dungeon);
-        });
 
-        Dungeon dungeon = Dungeon.Generate(seed,1,1,5,5,
+        GenerateDungeon();
+        InputManager.RegisterOnKeyDown(VK_T, var -> GenerateDungeon());
+    }
+
+    public void GenerateDungeon(){
+        Gizmos.Clear();
+        seed = new Random().nextInt();
+        Dungeon dungeon = Dungeon.Generate(seed,10,10,30,30,
                 16,16,0,dungeonTileset);
-        Dungeon.CreateDungeonGizmos(dungeon);
-
+        activeObjects.get(L_ENVIRONMENT).clear();
+        activeObjects.get(L_STATICS).clear();
+        player.pos = new Vertex(0,0);
         int offset = 0;
         for (var node : dungeon.nodes){
-            node.data.BuildRoom(12,12,seed + offset,dungeonTileset,Dungeon.GetOpenDirections(node));
+            node.data.BuildRoom(14,14,seed + offset,
+                    dungeonTileset,Dungeon.GetOpenDirections(node));
             activeObjects.get(L_ENVIRONMENT).add(node.data.environment);
             for(GameObj w : node.data.walls){
                 activeObjects.get(L_STATICS).add(w);
             }
             offset++;
         }
-
-        Wall wall = new Wall(new Vertex(0, 0), 64, 64, null);
-        activeObjects.get(L_STATICS).add(wall);
+        Dungeon.CreateDungeonGizmos(dungeon, 14 * 32 * 2);
     }
 
     public void SpawnEnemy(Enemy enemy){
@@ -350,7 +348,7 @@ public class Game2D implements Game{
     }
     @Override
     public void move() {
-        camera.pos = Vertex.Lerp(camera.pos,Vertex.add(player.pos,player.anchor),GameTime.DeltaTime() * 5);
+        camera.pos = Vertex.Lerp(camera.pos,Vertex.add(player.pos,player.anchor),GameTime.DeltaTime() * 3);
         for (GameObj go : goss().get(L_ENTITIES)) {
             go.move();
             if (go != player && go.touches(player)) go.onCollision(player);
@@ -460,7 +458,7 @@ public class Game2D implements Game{
                     " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 2));
         }
         g.drawString(String.format("Seed: " + seed),
-                0,height - 16);
+                4,height-4);
     }
 
     @Override

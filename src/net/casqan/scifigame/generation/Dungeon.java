@@ -122,8 +122,7 @@ public class Dungeon extends Graph<Room> {
         return 0;
     }
 
-    public static void CreateDungeonGizmos(Dungeon dungeon){
-        int roomSize = 12 * 32 * 2;
+    public static void CreateDungeonGizmos(Dungeon dungeon,int roomSize){
         for(int i = 0; i < dungeon.nodes.size(); i++){
             var room = dungeon.nodes.get(i);
 
