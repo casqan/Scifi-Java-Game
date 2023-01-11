@@ -23,6 +23,7 @@ public class Entity extends AbstractGameObj implements Cloneable{
     public int maxHealth;
     public int health;
     public float speed;
+    public Vertex screenPos;
 
     public Event<Entity> onDeath = new Event<>();
 
@@ -123,8 +124,8 @@ public class Entity extends AbstractGameObj implements Cloneable{
 
     @Override
     public void paintTo(Graphics g) {
-        var sp = getScreenPos();
-        g.drawImage(CurrentAnim().GetCurrentFrame(), (int)sp.x,(int)sp.y,null);
+        screenPos = getScreenPos();
+        g.drawImage(CurrentAnim().GetCurrentFrame(), (int)screenPos.x,(int)screenPos.y,null);
         g.setColor(Color.GRAY);
         var anchored = Camera.WorldToScreenPosition(Vertex.add(pos(),anchor()));
         g.drawRect((int)anchored.x ,(int) anchored.y,width,height);

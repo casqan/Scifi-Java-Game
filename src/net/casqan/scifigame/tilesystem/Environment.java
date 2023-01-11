@@ -12,6 +12,7 @@ public class Environment extends AbstractGameObj {
     public Image image;
     public Tilemap tilemap;
     public Tileset tileset;
+    Vertex screenPos = new Vertex(0,0);
 
     @Override
     public void move() { }
@@ -32,7 +33,7 @@ public class Environment extends AbstractGameObj {
 
     @Override
     public void paintTo(Graphics g) {
-        Vertex screenPos = getScreenPos();
+        screenPos = Camera.WorldToScreenPosition(pos);
         g.drawImage(image, (int)screenPos.x, (int)screenPos.y, null);
     }
 }

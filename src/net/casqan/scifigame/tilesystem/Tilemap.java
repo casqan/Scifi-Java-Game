@@ -29,7 +29,6 @@ public class Tilemap {
         var g = dest.createGraphics();
         for (int y = 0; y < map[0].length; y++){
             for (int x = 0; x < map.length; x++){
-                System.out.println("Tile: " + map[x][y]);
                 g.drawImage(tileset.GetTile(map[x][y]).image,
                         x * tileset.tileWidth * scale, y * tileset.tileHeight * scale,
                         (x + 1) * tileset.tileWidth * scale, (y + 1) * tileset.tileHeight * scale,
@@ -37,6 +36,8 @@ public class Tilemap {
                         null);
             }
         }
+        g.dispose();
+        dest.flush();
         return dest;
     }
 }

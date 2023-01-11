@@ -73,6 +73,8 @@ public class SpriteSheet {
         g.drawImage(sheet,
                 0, 0, scaled.x, scaled.y,
                 0, dimensions.y * index, dimensions.x, dimensions.y * (index + 1), null);
+        g.dispose();
+        dest.flush();
         return dest;
     }
 

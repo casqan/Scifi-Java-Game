@@ -13,7 +13,9 @@ public class Camera extends AbstractGameObj {
         return main;
     }
     public static Vertex WorldToScreenPosition(Vertex vertex){
-        return Vertex.add(Vertex.sub(vertex,Camera.Main().pos()), Game2D.getInstance().getScreen());
+        double x = vertex.x - Camera.Main().pos().x + Game2D.getInstance().getScreen().x;
+        double y = vertex.y - Camera.Main().pos().y + Game2D.getInstance().getScreen().y;
+        return new Vertex(x,y);
     }
     @Override
     public void paintTo(Graphics g) {

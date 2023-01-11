@@ -7,6 +7,7 @@ import net.casqan.scifigame.core.Camera;
 import net.casqan.scifigame.core.GameTime;
 import net.casqan.scifigame.entities.Enemy;
 import net.casqan.scifigame.entities.Entity;
+import net.casqan.scifigame.entities.Player;
 import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
@@ -38,7 +39,7 @@ public class Game2D implements Game{
 
     int width;
     int height;
-    Character player;
+    Player player;
     Camera camera;
     Font font;
     Vertex screen;
@@ -73,7 +74,7 @@ public class Game2D implements Game{
         random = new Random(seed);
     }
 
-    public void SetPlayer(Character player){
+    public void SetPlayer(Player player){
         this.player = player;
     }
 
@@ -99,7 +100,7 @@ public class Game2D implements Game{
     }
 
     @Override
-    public Character player() {
+    public Player player() {
         return player;
     }
 
@@ -165,7 +166,7 @@ public class Game2D implements Game{
 
         playerAnimations.put(EntityAction.DEATH,playerDeath);
 
-        Character _player = new Character(playerAnimations,new Vertex(0,0),
+        Player _player = new Player(playerAnimations,new Vertex(0,0),
                 new Vertex(112,132),32,16,new Vertex(0,0),1,EntityAction.IDLEPX);
         _player.onDeath.Clear();
         _player.name = "player";
@@ -321,7 +322,7 @@ public class Game2D implements Game{
     public void GenerateDungeon(){
         Gizmos.Clear();
         seed = new Random().nextInt();
-        Dungeon dungeon = Dungeon.Generate(seed,10,10,30,30,
+        Dungeon dungeon = Dungeon.Generate(seed,6,3,15,8,
                 16,16,0,dungeonTileset);
         activeObjects.get(L_ENVIRONMENT).clear();
         activeObjects.get(L_STATICS).clear();
@@ -346,6 +347,7 @@ public class Game2D implements Game{
             instance.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
             goss().get(L_ENTITIES).add(instance);
     }
+
     @Override
     public void move() {
         camera.pos = Vertex.Lerp(camera.pos,Vertex.add(player.pos,player.anchor),GameTime.DeltaTime() * 3);

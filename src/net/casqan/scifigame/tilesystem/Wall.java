@@ -6,6 +6,7 @@ import name.panitz.game2d.Vertex;
 import java.awt.*;
 
 public class Wall extends AbstractGameObj {
+    public Vertex screenPos;
 
     Image image;
     public Wall(Vertex pos, int width, int height,Image image) {
@@ -16,6 +17,7 @@ public class Wall extends AbstractGameObj {
     @Override
     public void paintTo(Graphics g) {
         g.setColor(Color.BLACK);
-        g.fillRect((int)getScreenPos().x,(int)getScreenPos().y,(int)width(),(int)height());
+        screenPos = getScreenPos();
+        g.fillRect((int)screenPos.x,(int)screenPos.y,(int)width(),(int)height());
     }
 }
