@@ -1,32 +1,43 @@
 package net.casqan.scifigame.generation;
 
+import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
-import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
-import net.casqan.scifigame.gizmos.Gizmo;
-import net.casqan.scifigame.gizmos.Gizmos;
-import net.casqan.scifigame.tilesystem.Environment;
-import net.casqan.scifigame.tilesystem.Tilemap;
-import net.casqan.scifigame.tilesystem.Tileset;
-import net.casqan.scifigame.tilesystem.Wall;
+import net.casqan.scifigame.tilesystem.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
+import static net.casqan.scifigame.Game2D.*;
 
 public class Room {
     public VertexInt position;
     public Tilemap tilemap;
+    public Tileset tileset;
     public Environment environment;
+    public int width;
+    public int height;
+    public int seed;
+    public List<Corridor> openDirections;
     public List<Wall> walls;
+    public List<Door> doors;
     public Room(){}
     public Room(VertexInt position){
         this.position = position;
     }
-    public void BuildRoom(int width, int height,int seed,Tileset tileset,List<VertexInt> openDirections){
+    public Room(VertexInt position, int width, int height,int seed,Tileset tileset,List<Corridor> openDirections){
+        this.position = position;
+        this.width = width;
+        this.height = height;
+        this.seed = seed;
+        this.tileset = tileset;
+        this.openDirections = openDirections;
+    }
+    public void BuildRoom(){
         tilemap = new Tilemap(tileset,null,4);
         walls = new ArrayList<>();
+        doors = new ArrayList<>();
         String[][] map = new String[width][height];
         var keys = tileset.tiles.keySet().toArray();
 
@@ -40,24 +51,83 @@ public class Room {
         }
         int w = width / 2 - 1;
         int h = height / 2 - 1;
-        if (openDirections.contains(new VertexInt(0,1))){
-            for (int x = w; x < w + 2; x++) {
-                collision[x][height - 1] = false;
-            }
-        }
-        if (openDirections.contains(new VertexInt(0,-1))){
+
+        var up = openDirections.stream().filter(
+                (c -> c.direction().equals(new VertexInt(0,-1))))
+                .findFirst();
+        if (up.isPresent()){
             for (int x = w; x < w + 2; x++) {
                 collision[x][0] = false;
             }
+            if(up.get().isExit()){
+                var pos = new Vertex(
+                        position.x * width * tileset.tileWidth * tilemap.scale,
+                        position.y * height * tileset.tileHeight * tilemap.scale);
+                pos.x += w * tileset.tileHeight * tilemap.scale;
+                doors.add(new Door( pos,
+                        tileset.tileWidth * tilemap.scale * 2,
+                        tileset.tileHeight * tilemap.scale,
+                        tileset.GetTile("0;0").image,
+                        up.get().child()));
+            }
         }
-        if (openDirections.contains(new VertexInt(1,0))){
+        var down = openDirections.stream().filter(
+                c -> c.direction().equals(new VertexInt(0,1)))
+                .findFirst();
+        if (down.isPresent()){
+            for (int x = w; x < w + 2; x++) {
+                collision[x][height - 1] = false;
+            }
+            if (down.get().isExit()){
+                var pos = new Vertex(
+                        position.x * width * tileset.tileWidth * tilemap.scale,
+                        position.y * height * tileset.tileHeight * tilemap.scale);
+                pos.x += w * tileset.tileHeight * tilemap.scale;
+                pos.y += (height - 1) * tileset.tileHeight * tilemap.scale;
+                doors.add(new Door( pos,
+                        tileset.tileWidth * tilemap.scale * 2,
+                        tileset.tileHeight * tilemap.scale,
+                        tileset.GetTile("0;0").image,
+                        down.get().child()));
+            }
+        }
+        var right = openDirections.stream().filter((
+                c -> c.direction().equals(new VertexInt(1,0))))
+                .findFirst();
+        if (right.isPresent()){
             for (int y = h; y < h + 2; y++) {
                 collision[width - 1][y] = false;
             }
+            if(right.get().isExit()) {
+                var pos = new Vertex(
+                        position.x * width * tileset.tileWidth * tilemap.scale,
+                        position.y * height * tileset.tileHeight * tilemap.scale);
+                pos.x += (width - 1) * tileset.tileHeight * tilemap.scale;
+                pos.y += h * tileset.tileHeight * tilemap.scale;
+                doors.add(new Door(pos,
+                        tileset.tileWidth * tilemap.scale,
+                        tileset.tileHeight * tilemap.scale * 2,
+                        tileset.GetTile("0;0").image,
+                        right.get().child()));
+            }
         }
-        if (openDirections.contains(new VertexInt(-1,0))){
+        var left = openDirections.stream().filter((
+                c -> c.direction().equals(new VertexInt(-1,0))))
+                .findFirst();
+        if (left.isPresent()){
             for (int y = h; y < h + 2; y++) {
                 collision[0][y] = false;
+            }
+            if (left.get().isExit()){
+                var pos = new Vertex(
+                        position.x * width * tileset.tileWidth * tilemap.scale,
+                        position.y * height * tileset.tileHeight * tilemap.scale);
+                pos.y += h * tileset.tileHeight * tilemap.scale;
+                doors.add(new Door( pos,
+                        tileset.tileWidth * tilemap.scale,
+                        tileset.tileHeight * tilemap.scale * 2,
+                        tileset.GetTile("0;0").image,
+                        left.get().child()));
             }
         }
 
@@ -86,5 +156,12 @@ public class Room {
             }
         }
 
+        for(GameObj wall : walls){
+            getInstance().Instantiate(L_STATICS,wall);
+        }
+        for (var door : doors){
+            getInstance().Instantiate(L_STATICS,door);
+        }
+        getInstance().Instantiate(L_ENVIRONMENT,environment);
     }
 }

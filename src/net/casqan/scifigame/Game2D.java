@@ -8,20 +8,15 @@ import net.casqan.scifigame.core.GameTime;
 import net.casqan.scifigame.entities.Enemy;
 import net.casqan.scifigame.entities.Entity;
 import net.casqan.scifigame.entities.Player;
+import net.casqan.scifigame.extensions.Pair;
 import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.generation.Dungeon;
-import net.casqan.scifigame.generation.Room;
-import net.casqan.scifigame.gizmos.Gizmo;
 import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.sprite.*;
-import net.casqan.scifigame.entities.Character;
-import net.casqan.scifigame.tilesystem.Environment;
-import net.casqan.scifigame.tilesystem.Tilemap;
 import net.casqan.scifigame.tilesystem.Tileset;
-import net.casqan.scifigame.tilesystem.Wall;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -42,6 +37,8 @@ public class Game2D implements Game{
     Camera camera;
     Font font;
     Vertex screen;
+    List<Pair<String,GameObj>> destroyQueue = new ArrayList<>();
+    List<Pair<String,GameObj>> addQueue = new ArrayList<>();
     public Vertex getScreen() {
         return screen;
     }
@@ -169,6 +166,7 @@ public class Game2D implements Game{
         _player.onDeath.Clear();
         _player.name = "player";
         _player.health = 200;
+        _player.keys = 1;
         SetPlayer(_player);
 
         camera = new Camera();
@@ -234,7 +232,6 @@ public class Game2D implements Game{
                 if (!(go instanceof Entity)) continue;
                 ((Entity)go).DealDamage(10);
             }
-            System.gc();
             System.out.println("====================================");
         });
 
@@ -325,16 +322,16 @@ public class Game2D implements Game{
         activeObjects.get(L_ENVIRONMENT).clear();
         activeObjects.get(L_STATICS).clear();
         player.pos = new Vertex(0,0);
+
         int offset = 0;
         for (var node : dungeon.nodes){
-            node.data.BuildRoom(14,14,seed + offset,
-                    dungeonTileset,Dungeon.GetOpenDirections(node));
-            activeObjects.get(L_ENVIRONMENT).add(node.data.environment);
-            for(GameObj w : node.data.walls){
-                activeObjects.get(L_STATICS).add(w);
-            }
+            node.data.tileset = dungeonTileset;
+            node.data.width = 16;
+            node.data.height = 16;
+            node.data.openDirections = Dungeon.GetCorridors(node);
             offset++;
         }
+        dungeon.Root().data.BuildRoom();
         Dungeon.CreateDungeonGizmos(dungeon, 14 * 32 * 2);
     }
 
@@ -342,8 +339,12 @@ public class Game2D implements Game{
             var pos = new Vertex(.5f - Math.random(), .5f - Math.random());
             pos.Normalize();
             Enemy instance = new Enemy(enemy,pos.mult(500));
-            instance.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
+            instance.onDeath.AddListener((entity -> destroy(entity,L_ENTITIES)));
             goss().get(L_ENTITIES).add(instance);
+    }
+
+    public void Instantiate(String layer, GameObj obj){
+        addQueue.add(new Pair<>(layer,obj));
     }
 
     @Override
@@ -355,25 +356,27 @@ public class Game2D implements Game{
             for(var gostat : goss().get(L_STATICS)){
                 if (go.touches(gostat)) {
                     go.onCollision(gostat);
-                    //gostat.onCollision(go);
+                    gostat.onCollision(go);
                 }
             }
         }
-
-        /*if(collidingWithPlayer.size() == 0)  return;
-        //Get Vertex of Player pos and colliding Object pos
-        //move Object away from Player
-        for (GameObj go : collidingWithPlayer){
-            go.onCollision(player);
-            go.pos().add(new Vertex(-go.velocity().x,-go.velocity().y));
-            if (player.attacking) continue;
-            go.pos().add(new Vertex(player().velocity().x,player().velocity().y));
-        }
-        collidingWithPlayer.clear();*/
     }
 
     @Override
-    public void doChecks() { }
+    public void doChecks() {
+        if (destroyQueue.size() > 0){
+            for (var go : destroyQueue){
+                goss().get(go.first).remove(go.second);
+            }
+            destroyQueue.clear();
+        }
+        if (addQueue.size() > 0){
+            for (var go : addQueue){
+                goss().get(go.first).add(go.second);
+            }
+            addQueue.clear();
+        }
+    }
 
     @Override
     public void keyTypedReaction(KeyEvent keyEvent) { }
@@ -396,6 +399,12 @@ public class Game2D implements Game{
     @Override
     public boolean lost() {
         return false;
+    }
+
+    @Override
+    public void destroy(GameObj go, String layer) {
+        if (destroyQueue.contains(new Pair<>(layer,go))) return;
+        destroyQueue.add(new Pair<>(layer,go));
     }
 
     @Override
@@ -450,6 +459,8 @@ public class Game2D implements Game{
                 width - 200,80);
         g.drawString(String.format("Health: %d", player.health),
                 width - 200,96);
+        g.drawString(String.format("Keys: %d", player.keys),
+                width - 200,112);
         g.drawString(String.format("Entities: "),
                 0,16);
         for(int i = 0; i < goss().get(L_ENTITIES).size(); i++){

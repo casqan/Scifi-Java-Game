@@ -16,12 +16,14 @@ public class Door extends Wall {
     public Door(Vertex pos, int width, int height, Image image, Node<Room> room) {
         super(pos, width, height, image);
         this.image = image;
+        this.node = room;
     }
 
     @Override
     public void paintTo(Graphics g) {
         screenPos = getScreenPos();
-        g.drawImage(image, (int)screenPos.x,(int)screenPos.y,null);
+        g.setColor(Color.GRAY);
+        g.fillRect((int) screenPos.x, (int) screenPos.y, (int)width, (int)height);
     }
 
     @Override
@@ -29,9 +31,9 @@ public class Door extends Wall {
         super.onCollision(that);
         if (that != Game2D.getInstance().player()) return;
         var player = Game2D.getInstance().player();
-        if (player.Keys() > 1)
-            Game2D.getInstance().goss()
-                .get(Game2D.L_STATICS).remove(this);
-
+        if (player.Keys() < 1) return;
+        node.data.BuildRoom();
+        Game2D.getInstance().player().keys -= 1;
+        Game2D.getInstance().destroy(this,Game2D.L_STATICS);
     }
 }

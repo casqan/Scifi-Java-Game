@@ -151,11 +151,12 @@ public class Dungeon extends Graph<Room> {
         }
     }
 
-    public static List<VertexInt> GetOpenDirections(Node<Room> node) {
-        List<VertexInt> dirs = new ArrayList<>();
-        if (node.parent != null) dirs.add(GetOpenDirections(node, node.parent));
+    public static List<Corridor> GetCorridors(Node<Room> node) {
+        List<Corridor> dirs = new ArrayList<>();
+        if (node.parent != null)
+            dirs.add(new Corridor(GetOpenDirections(node, node.parent),false,node.parent,node));
         for (Node<Room> child : node.children) {
-            dirs.add(GetOpenDirections(node, child));
+            dirs.add(new Corridor(GetOpenDirections(node,child),true,node,child));
         }
         return dirs;
     }

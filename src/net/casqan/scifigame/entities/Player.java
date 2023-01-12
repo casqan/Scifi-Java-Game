@@ -14,12 +14,12 @@ public class Player extends Character{
         super(animations, pos, anchor, width, height, velocity, speed, currentAction);
     }
 
-    int keys;
+    public int keys;
     public int Keys(){
         return keys;
     }
 
-    int coins;
+    public int coins;
     public int Coins(){
         return coins;
     }
