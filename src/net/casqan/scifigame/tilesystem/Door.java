@@ -1,4 +1,4 @@
-package net.casqan.scifigame.entities;
+package net.casqan.scifigame.tilesystem;
 
 import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
@@ -29,7 +29,7 @@ public class Door extends Wall {
         super.onCollision(that);
         if (that != Game2D.getInstance().player()) return;
         var player = Game2D.getInstance().player();
-        if (player.keys > 1)
+        if (player.Keys() > 1)
             Game2D.getInstance().goss()
                 .get(Game2D.L_STATICS).remove(this);
 

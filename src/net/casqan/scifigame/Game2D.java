@@ -36,7 +36,6 @@ public class Game2D implements Game{
     public static final String L_ENTITIES = "L_ENTITIES";
     public static final String L_ENVIRONMENT = "L_ENV";
     public static final String L_STATICS = "L_STATICS";
-
     int width;
     int height;
     Player player;
@@ -59,7 +58,6 @@ public class Game2D implements Game{
     private static Random random;
     public static Random Random() {return random;}
     public Tileset dungeonTileset;
-    //EmptyGameObj damageRect;
 
     Game2D(int width, int height, int seed){
         instance = this;
