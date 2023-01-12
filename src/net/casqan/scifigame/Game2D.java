@@ -12,7 +12,7 @@ import net.casqan.scifigame.extensions.Pair;
 import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
-import net.casqan.scifigame.generation.Dungeon;
+import net.casqan.scifigame.dungeon.Dungeon;
 import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.sprite.*;
@@ -343,8 +343,11 @@ public class Game2D implements Game{
             goss().get(L_ENTITIES).add(instance);
     }
 
-    public void Instantiate(String layer, GameObj obj){
+    void _Instantiate(String layer, GameObj obj){
         addQueue.add(new Pair<>(layer,obj));
+    }
+    public static void Instantiate(String layer, GameObj obj){
+        getInstance()._Instantiate(layer,obj);
     }
 
     @Override
@@ -463,11 +466,11 @@ public class Game2D implements Game{
                 width - 200,112);
         g.drawString(String.format("Entities: "),
                 0,16);
-        for(int i = 0; i < goss().get(L_ENTITIES).size(); i++){
+       /*for(int i = 0; i < goss().get(L_ENTITIES).size(); i++){
             var o = goss().get(L_ENTITIES).get(i);
             g.drawString(String.format(o.name() + "|" + String.format("x:%.2f",o.pos().x) +
                     " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 2));
-        }
+        }*/
         g.drawString(String.format("Seed: " + seed),
                 4,height-4);
     }

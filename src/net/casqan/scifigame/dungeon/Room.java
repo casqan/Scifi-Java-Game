@@ -1,8 +1,9 @@
-package net.casqan.scifigame.generation;
+package net.casqan.scifigame.dungeon;
 
 import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
+import net.casqan.scifigame.entities.Enemy;
 import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.tilesystem.*;
 
@@ -16,6 +17,7 @@ public class Room {
     public Tilemap tilemap;
     public Tileset tileset;
     public Environment environment;
+    public RoomType type;
     public int width;
     public int height;
     public int seed;
@@ -163,5 +165,26 @@ public class Room {
             getInstance().Instantiate(L_STATICS,door);
         }
         getInstance().Instantiate(L_ENVIRONMENT,environment);
+        Populate();
+    }
+
+    public void Populate(){
+        switch (type){
+            case Start:
+            case Boss:
+            case End:
+            case Merchant:
+                break;
+            case Normal:
+                var pos = new Vertex(
+                        position.x * width * tileset.tileWidth * tilemap.scale,
+                        position.y * height * tileset.tileHeight * tilemap.scale);
+                pos.x += (width / 2) * tileset.tileWidth * tilemap.scale;
+                pos.y += (height / 2) * tileset.tileHeight * tilemap.scale;
+                //Instantiate(L_ENTITIES,Game2D.getInstance().enemies["grunt"]);
+                break;
+            default:
+                System.out.println("Unknown room type. This should never happen. How did this happen?");
+        }
     }
 }

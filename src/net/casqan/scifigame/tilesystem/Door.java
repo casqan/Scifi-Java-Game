@@ -3,9 +3,8 @@ package net.casqan.scifigame.tilesystem;
 import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
-import net.casqan.scifigame.generation.Node;
-import net.casqan.scifigame.generation.Room;
-import net.casqan.scifigame.tilesystem.Wall;
+import net.casqan.scifigame.dungeon.Node;
+import net.casqan.scifigame.dungeon.Room;
 
 import java.awt.*;
 

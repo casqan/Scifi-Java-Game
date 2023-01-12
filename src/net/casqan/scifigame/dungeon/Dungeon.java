@@ -1,4 +1,4 @@
-package net.casqan.scifigame.generation;
+package net.casqan.scifigame.dungeon;
 
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.extensions.Rect;
@@ -19,15 +19,6 @@ public class Dungeon extends Graph<Room> {
         super(rootObj);
     }
 
-    //Dungeon generation Algorythm
-    //Start at a root room
-    //Step forward in any direction
-    //If the room is not occupied, place it
-    //If the room is occupied, step back and try again
-    //Do this until Max room depth Has been reached
-    //Take a random room and step forward in any direction
-    //If the room is not occupied, place it
-    //Do this for a random amount of branches.
     public static Dungeon Generate(long seed, int maxBranches, int minBranches, int maxBranchDepth, int minBranchDepth,
                                    int roomWidth, int roomHeight, int roomSpacing, Tileset tileset){
         Dungeon dungeon = new Dungeon(new Room(new VertexInt(0,0)));

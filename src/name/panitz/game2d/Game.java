@@ -1,8 +1,6 @@
 package name.panitz.game2d;
 import net.casqan.scifigame.input.InputManager;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.awt.event.*;
@@ -59,13 +57,15 @@ public interface Game{
       if(f.isUndecorated()){
         f.dispose();
         f.setUndecorated(false);
-        f.setExtendedState(Frame.MAXIMIZED_BOTH);
+        f.setExtendedState(Frame.NORMAL);
+        f.setSize(new Dimension(width(),height()));
         f.pack();
         f.setVisible(true);
       }else {
         f.dispose();
         f.setUndecorated(true);
-        f.setExtendedState(Frame.NORMAL);
+        f.setExtendedState(Frame.MAXIMIZED_BOTH);
+        f.setSize(f.getToolkit().getScreenSize());
         f.pack();
         f.setVisible(true);
       }

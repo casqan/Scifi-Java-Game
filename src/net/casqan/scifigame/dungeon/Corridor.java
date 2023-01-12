@@ -1,4 +1,4 @@
-package net.casqan.scifigame.generation;
+package net.casqan.scifigame.dungeon;
 
 import net.casqan.scifigame.extensions.VertexInt;
 
