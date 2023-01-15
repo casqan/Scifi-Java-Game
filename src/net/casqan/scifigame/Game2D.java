@@ -7,6 +7,7 @@ import net.casqan.scifigame.core.Camera;
 import net.casqan.scifigame.core.GameTime;
 import net.casqan.scifigame.entities.Enemy;
 import net.casqan.scifigame.entities.Entity;
+import net.casqan.scifigame.entities.Key;
 import net.casqan.scifigame.entities.Player;
 import net.casqan.scifigame.extensions.Pair;
 import net.casqan.scifigame.extensions.Physics;
@@ -31,6 +32,8 @@ public class Game2D implements Game{
     public static final String L_ENTITIES = "L_ENTITIES";
     public static final String L_ENVIRONMENT = "L_ENV";
     public static final String L_STATICS = "L_STATICS";
+    public HashMap<String,Enemy> prefabs = new HashMap<>();
+    public Key keyEntity;
     int width;
     int height;
     Player player;
@@ -166,7 +169,7 @@ public class Game2D implements Game{
         _player.onDeath.Clear();
         _player.name = "player";
         _player.health = 200;
-        _player.keys = 1;
+        _player.keys = 100;
         SetPlayer(_player);
 
         camera = new Camera();
@@ -265,9 +268,10 @@ public class Game2D implements Game{
         //slime.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
         slime.maxHealth = 20;
 
-        Enemy player2 = new Enemy(playerAnimations,new Vertex(0,0),
+        Enemy enemy = new Enemy(playerAnimations,new Vertex(0,0),
                 new Vertex(112,132),32,16,new Vertex(0,0),1.5f,EntityAction.IDLEPX);
-        player2.maxHealth = 20;
+        enemy.maxHealth = 20;
+        prefabs.put("enemy",enemy);
 
         //Setup Merchant
         Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/idle.png",
@@ -285,9 +289,14 @@ public class Game2D implements Game{
         var list = new ArrayList<GameObj>();
         list.add(player);
 
+        //Load key Prefab
+        Animation keyAnimation = new Animation(new SpriteSheet("sprites/ui/key.png",
+                new VertexInt(16,16),4), 4,true);
+        keyEntity = new Key(keyAnimation,Vertex.zero,Vertex.zero,64,64);
 
+        //!DEBUG
         InputManager.RegisterOnKeyDown(VK_E,(key) -> {
-            SpawnEnemy(player2);
+            SpawnEnemy(enemy,new Vertex(random.nextInt(500),random.nextInt(500)));
         });
 
         goss().put(L_ENTITIES, list);
@@ -332,22 +341,24 @@ public class Game2D implements Game{
             offset++;
         }
         dungeon.Root().data.BuildRoom();
-        Dungeon.CreateDungeonGizmos(dungeon, 14 * 32 * 2);
+        Dungeon.CreateDungeonGizmos(dungeon, 32);
     }
 
-    public void SpawnEnemy(Enemy enemy){
-            var pos = new Vertex(.5f - Math.random(), .5f - Math.random());
-            pos.Normalize();
-            Enemy instance = new Enemy(enemy,pos.mult(500));
+    public void SpawnEnemy(Enemy enemy, Vertex pos){
+            Enemy instance = new Enemy(enemy,pos);
             instance.onDeath.AddListener((entity -> destroy(entity,L_ENTITIES)));
             goss().get(L_ENTITIES).add(instance);
     }
 
-    void _Instantiate(String layer, GameObj obj){
+    void _Instantiate(String layer, GameObj obj,Vertex pos){
+        obj.pos().moveTo(pos);
         addQueue.add(new Pair<>(layer,obj));
     }
     public static void Instantiate(String layer, GameObj obj){
-        getInstance()._Instantiate(layer,obj);
+        getInstance()._Instantiate(layer,obj, obj.pos());
+    }
+    public static void Instantiate(String layer, GameObj obj, Vertex pos){
+        getInstance()._Instantiate(layer,obj,pos);
     }
 
     @Override
@@ -355,7 +366,11 @@ public class Game2D implements Game{
         camera.pos = Vertex.Lerp(camera.pos,Vertex.add(player.pos,player.anchor),GameTime.DeltaTime() * 3);
         for (GameObj go : goss().get(L_ENTITIES)) {
             go.move();
+            //We save some Performance, by only checking for collisions with the Player
+            //This is because the Player is the only Entity that needs to collide with other Entities
             if (go != player && go.touches(player)) go.onCollision(player);
+
+            //Checks for static objects like walls or doors still needs to be done for every Entity
             for(var gostat : goss().get(L_STATICS)){
                 if (go.touches(gostat)) {
                     go.onCollision(gostat);

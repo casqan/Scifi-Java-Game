@@ -42,6 +42,12 @@ public class Enemy extends Character{
     }
 
     @Override
+    public void Die() {
+        Game2D.getInstance().destroy(this,Game2D.L_ENTITIES);
+        super.Die();
+    }
+
+    @Override
     public void onCollision(GameObj other) {
         super.onCollision(other);
         if (other != Game2D.getInstance().player()) return;

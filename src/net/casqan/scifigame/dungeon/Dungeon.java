@@ -58,6 +58,7 @@ public class Dungeon extends Graph<Room> {
                 }
             }
         }
+        dungeon.Root().data.type = RoomType.Start;
         return dungeon;
     }
     public static Room BuildRoom(Dungeon dungeon, Node<Room> node, int searched){
@@ -120,7 +121,7 @@ public class Dungeon extends Graph<Room> {
             var r = new Rect(room.data.position.mult(roomSize),new Vertex(1,1).mult(roomSize));
 
             Gizmos.Add(new Gizmo(r,new Color((255 / dungeon.nodes.size()) * i,
-                    255 - ((255 / dungeon.nodes.size()) * i),0),false));
+                    255 - ((255 / dungeon.nodes.size()) * i),0),true));
             if(room.parent == null) continue;
             Vertex dir = Vertex.sub(room.parent.data.position.mult(roomSize),
                     room.data.position.mult(roomSize));

@@ -1,9 +1,12 @@
 package net.casqan.scifigame.dungeon;
 
+import name.panitz.game2d.Game;
 import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
+import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.entities.Enemy;
+import net.casqan.scifigame.entities.Key;
 import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.tilesystem.*;
 
@@ -42,7 +45,6 @@ public class Room {
         doors = new ArrayList<>();
         String[][] map = new String[width][height];
         var keys = tileset.tiles.keySet().toArray();
-
         boolean[][] collision = new boolean[width][height];
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -159,32 +161,75 @@ public class Room {
         }
 
         for(GameObj wall : walls){
-            getInstance().Instantiate(L_STATICS,wall);
+            Instantiate(L_STATICS,wall);
         }
         for (var door : doors){
-            getInstance().Instantiate(L_STATICS,door);
+            Instantiate(L_STATICS,door);
         }
-        getInstance().Instantiate(L_ENVIRONMENT,environment);
+        Instantiate(L_ENVIRONMENT,environment);
         Populate();
     }
 
     public void Populate(){
+        System.out.println(type);
+        if (type == null){
+            if (doors.size() < 1 ){
+                type = RoomType.End;
+            }else if (Random().nextFloat() > .9f){
+                type = RoomType.Merchant;
+            }else {
+                type = RoomType.Normal;
+            }
+        }
+        System.out.println(type);
         switch (type){
-            case Start:
             case Boss:
             case End:
+                break;
             case Merchant:
+            case Start:
+                SpawnKeysInRoom();
                 break;
             case Normal:
-                var pos = new Vertex(
-                        position.x * width * tileset.tileWidth * tilemap.scale,
+                var count = Random().nextInt(5,10);
+                List<Enemy> enemies = new ArrayList<>();
+                for (int i = 0;i < count;i++){
+                    var pos = new Vertex(
+                            position.x * width * tileset.tileWidth * tilemap.scale,
                         position.y * height * tileset.tileHeight * tilemap.scale);
-                pos.x += (width / 2) * tileset.tileWidth * tilemap.scale;
-                pos.y += (height / 2) * tileset.tileHeight * tilemap.scale;
-                //Instantiate(L_ENTITIES,Game2D.getInstance().enemies["grunt"]);
+                    var obj = getInstance().prefabs.get("enemy");
+                    pos.x += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale - obj.anchor().x;
+                    pos.y += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale - obj.anchor().y;
+                    pos.x += tileset.tileWidth * tilemap.scale;
+                    pos.y += tileset.tileWidth * tilemap.scale;
+                    var en = new Enemy(obj,pos);
+                    enemies.add(en);
+                    Instantiate(L_ENTITIES,en);
+                }
+                for (int i = 0; i < doors.size(); i++){
+                    enemies.get(i).onDeath = new Event<>();
+                    enemies.get(i).onDeath.AddListener((var) -> {
+                        Instantiate(L_ENTITIES,
+                                new Key(getInstance().keyEntity,
+                                        Vertex.add(var.pos,var.anchor)));
+                    });
+                }
                 break;
             default:
                 System.out.println("Unknown room type. This should never happen. How did this happen?");
+        }
+    }
+
+    private void SpawnKeysInRoom() {
+        for (int i = 0; i < doors.size(); i++){
+            var pos = new Vertex(
+                    position.x * width * tileset.tileWidth * tilemap.scale,
+                    position.y * height * tileset.tileHeight * tilemap.scale);
+            pos.x += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale;
+            pos.y += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale;
+            pos.x += tileset.tileWidth * tilemap.scale;
+            pos.y += tileset.tileWidth * tilemap.scale;
+            Instantiate(L_ENTITIES,new Key(getInstance().keyEntity,pos));
         }
     }
 }

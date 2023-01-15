@@ -108,6 +108,7 @@ public class Entity extends AbstractGameObj implements Cloneable{
         health -= damage;
         if (health <= 0){
             onDeath.Invoke(this);
+            Die();
         }
     }
     public void Die(){

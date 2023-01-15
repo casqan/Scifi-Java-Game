@@ -3,10 +3,7 @@ package name.panitz.game2d;
 public class Vertex {
 	public double x;
 	public double y;
-
-	public double magnitude(){
-		return Math.sqrt(x*x + y*y);
-	}
+	public static final Vertex zero = new Vertex(0,0);
 
 	public Vertex(double x, double y) {
 		this.x = x;
@@ -16,7 +13,6 @@ public class Vertex {
 		this.x = vertex.x;
 		this.y = vertex.y;
 	}
-
 	public void add(Vertex that) {
 		x += that.x;
 		y += that.y;
@@ -51,6 +47,9 @@ public class Vertex {
 	//It is used to smoothly move from one point to another
 	public static Vertex Lerp(Vertex a, Vertex b, double t){
 		return new Vertex(a.x + (b.x - a.x) * t, a.y + (b.y - a.y) * t);
+	}
+	public double magnitude(){
+		return Math.sqrt(x*x + y*y);
 	}
 	public Vertex normalized(){
 		return new Vertex(this).mult(1d / this.magnitude());
