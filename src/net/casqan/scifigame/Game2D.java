@@ -5,10 +5,7 @@ import net.casqan.scifigame.animations.Animation;
 import net.casqan.scifigame.animations.EntityAction;
 import net.casqan.scifigame.core.Camera;
 import net.casqan.scifigame.core.GameTime;
-import net.casqan.scifigame.entities.Enemy;
-import net.casqan.scifigame.entities.Entity;
-import net.casqan.scifigame.entities.Key;
-import net.casqan.scifigame.entities.Player;
+import net.casqan.scifigame.entities.*;
 import net.casqan.scifigame.extensions.Pair;
 import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
@@ -39,22 +36,20 @@ public class Game2D implements Game{
     Player player;
     Camera camera;
     Font font;
-    Vertex screen;
+    VertexInt screen;
     List<Pair<String,GameObj>> destroyQueue = new ArrayList<>();
     List<Pair<String,GameObj>> addQueue = new ArrayList<>();
-    public Vertex getScreen() {
+    public VertexInt getScreen() {
         return screen;
     }
     static Game2D instance;
     public static Game2D getInstance() {
         return instance;
     }
-    public int seed = 0;
+    public int seed;
 
-    final Color backgroundColor = new Color(0.17f,0.17f,0.17f);
     HashMap<String,List<GameObj>> activeObjects;
     Set<String> damageLayers;
-    List<GameObj> collidingWithPlayer = new ArrayList<>();
     private static Random random;
     public static Random Random() {return random;}
     public Tileset dungeonTileset;
@@ -67,7 +62,7 @@ public class Game2D implements Game{
         activeObjects.put(L_ENTITIES,new ArrayList<>());
         this.width = width;
         this.height = height;
-        screen = new Vertex(width/2f,height/2f);
+        screen = new VertexInt(width/2,height/2);
         this.seed = seed;
         random = new Random(seed);
     }
@@ -321,6 +316,8 @@ public class Game2D implements Game{
 
         GenerateDungeon();
         InputManager.RegisterOnKeyDown(VK_T, var -> GenerateDungeon());
+        var _boss = new Boss(new Vertex(200,200),16*4*16, 16*4*16,merchantIdle);
+        Instantiate(L_ENTITIES,_boss);
     }
 
     public void GenerateDungeon(){
@@ -394,6 +391,9 @@ public class Game2D implements Game{
             }
             addQueue.clear();
         }
+        for (var key : goss().keySet())
+            for (var go : goss().get(key))
+                go.Update();
     }
 
     @Override
@@ -452,8 +452,8 @@ public class Game2D implements Game{
         for (var go : goss().get(L_ENTITIES))
             try { go.paintTo(g); }
             catch (Exception e) {
-                //System.out.println(e);
-            };
+                System.out.println(e);
+            }
 
         //Draw Gizmos
         Gizmos.paintTo(g);

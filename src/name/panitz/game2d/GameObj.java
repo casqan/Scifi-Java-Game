@@ -6,7 +6,7 @@ public interface GameObj{
   double width();
   double height();
   String name();
-
+  void Update();
   default int getZIndex(){
     return (int)((pos().y + anchor().y) * 100);
   };

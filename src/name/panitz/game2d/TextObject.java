@@ -10,6 +10,11 @@ public record TextObject(String name, Vertex pos, Vertex velocity,Vertex anchor
   }
 
 
+  @Override
+  public void Update() {
+
+  }
+
   public void paintTo(Graphics g){
     g.setFont(new Font(fontName, Font.PLAIN, fontSize));
     g.drawString(text, (int)pos().x, (int)pos().y);

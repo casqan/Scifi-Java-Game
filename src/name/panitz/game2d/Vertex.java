@@ -1,5 +1,7 @@
 package name.panitz.game2d;
 
+import net.casqan.scifigame.extensions.VertexInt;
+
 public class Vertex {
 	public double x;
 	public double y;
@@ -19,6 +21,9 @@ public class Vertex {
 	}
 
 	public static Vertex add(Vertex v1, Vertex v2){
+		return new Vertex(v1.x + v2.x, v1.y + v2.y);
+	}
+	public static Vertex add(Vertex v1, VertexInt v2){
 		return new Vertex(v1.x + v2.x, v1.y + v2.y);
 	}
 	public static Vertex sub(Vertex v1, Vertex v2){

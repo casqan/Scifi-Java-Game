@@ -32,6 +32,11 @@ public class Environment extends AbstractGameObj {
     }
 
     @Override
+    public void Update() {
+
+    }
+
+    @Override
     public void paintTo(Graphics g) {
         screenPos = Camera.WorldToScreenPosition(pos);
         g.drawImage(image, (int)screenPos.x, (int)screenPos.y, null);

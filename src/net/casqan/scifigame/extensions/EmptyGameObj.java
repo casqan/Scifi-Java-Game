@@ -17,6 +17,12 @@ public class EmptyGameObj extends AbstractGameObj {
     public Vertex anchor;
     @Override
     public Vertex anchor() {return anchor;}
+
+    @Override
+    public void Update() {
+
+    }
+
     public int height;
     public int width;
 

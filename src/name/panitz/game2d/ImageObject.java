@@ -22,6 +22,11 @@ public record ImageObject(String name, Vertex pos, Vertex velocity, Vertex ancho
     this(new Vertex(0,0),new Vertex(0,0),new Vertex(0,0),fileName);
   }
 
+  @Override
+  public void Update() {
+
+  }
+
   public void paintTo(Graphics g){
     g.drawImage(image, (int)pos.x, (int)pos.y, null);
   }

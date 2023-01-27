@@ -15,6 +15,11 @@ public class Wall extends AbstractGameObj {
     }
 
     @Override
+    public void Update() {
+
+    }
+
+    @Override
     public void paintTo(Graphics g) {
         g.setColor(Color.BLACK);
         screenPos = getScreenPos();

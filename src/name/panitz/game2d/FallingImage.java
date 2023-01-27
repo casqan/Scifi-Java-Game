@@ -72,6 +72,11 @@ public class FallingImage extends AbstractGameObj {
 	}
 
 	@Override
+	public void Update() {
+
+	}
+
+	@Override
 	public void paintTo(Graphics g) {
 	    g.drawImage(image, (int)pos.x, (int)pos.y, null);		
 	}

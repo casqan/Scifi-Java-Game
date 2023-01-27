@@ -94,6 +94,11 @@ public class Entity extends AbstractGameObj implements Cloneable{
         return height;
     }
 
+    @Override
+    public void Update() {
+
+    }
+
     public void SetCurrentAction(String action){
         currentAction = action;
         animations.get(currentAction).Play();

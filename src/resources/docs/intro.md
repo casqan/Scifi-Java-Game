@@ -62,3 +62,12 @@ Raum-Typen:
 - Normal: Ein normaler Raum
 - End: der Endpunkt eines Pfads, um letzten Raum zukommen, der noch nicht geöffnete Türen enthält.
 - Boss: Der Boss-Raum
+
+## Entities
+
+### Enemies
+
+### `Boss`
+Der Boss ist ein Statisches Entity in Form eines Kristalls, vom Kristall aus werden in einem bestimmten
+Abstand 5 Gegner gespawnt, die Bekämpft werden müssen, während der Kristall immer wider eine Schock-welle
+aussendet, die dem Spieler schaden zufügt, wenn er zu nah am Kristall ist.

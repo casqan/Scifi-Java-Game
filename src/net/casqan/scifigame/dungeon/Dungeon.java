@@ -15,10 +15,11 @@ import java.util.Random;
 
 public class Dungeon extends Graph<Room> {
     static Random random;
+    Room bossRoom;
+    public Room BossRoom(){return bossRoom;}
     public Dungeon(Room rootObj) {
         super(rootObj);
     }
-
     public static Dungeon Generate(long seed, int maxBranches, int minBranches, int maxBranchDepth, int minBranchDepth,
                                    int roomWidth, int roomHeight, int roomSpacing, Tileset tileset){
         Dungeon dungeon = new Dungeon(new Room(new VertexInt(0,0)));
@@ -58,7 +59,15 @@ public class Dungeon extends Graph<Room> {
                 }
             }
         }
+
         dungeon.Root().data.type = RoomType.Start;
+        //Find a room that has no exit Make it an End room
+        for (var n : dungeon.nodes){
+            if (n.children.size() < 1) {
+                if (dungeon.bossRoom == null) n.data.type = RoomType.Boss;
+                else n.data.type = RoomType.End;
+            }
+        }
         return dungeon;
     }
     public static Room BuildRoom(Dungeon dungeon, Node<Room> node, int searched){
@@ -89,9 +98,9 @@ public class Dungeon extends Graph<Room> {
         if(occupied){
             return BuildRoom(dungeon, node, searched + dir);
         }
+        Room _r = new Room(VertexInt.Add(node.data.position,GetDirection(dir)));
         return new Room(VertexInt.Add(node.data.position,GetDirection(dir)));
     }
-
     public static VertexInt GetDirection(int dir){
         switch (dir){
             case 1:
@@ -113,7 +122,6 @@ public class Dungeon extends Graph<Room> {
         if (dir.x == 0 && dir.y == -1) return 8;
         return 0;
     }
-
     public static void CreateDungeonGizmos(Dungeon dungeon,int roomSize){
         for(int i = 0; i < dungeon.nodes.size(); i++){
             var room = dungeon.nodes.get(i);
@@ -142,7 +150,6 @@ public class Dungeon extends Graph<Room> {
             Gizmos.Add(new Gizmo(c, Color.blue));
         }
     }
-
     public static List<Corridor> GetCorridors(Node<Room> node) {
         List<Corridor> dirs = new ArrayList<>();
         if (node.parent != null)

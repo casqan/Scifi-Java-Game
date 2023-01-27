@@ -17,6 +17,12 @@ public class Camera extends AbstractGameObj {
         double y = vertex.y - Camera.Main().pos().y + Game2D.getInstance().getScreen().y;
         return new Vertex(x,y);
     }
+
+    @Override
+    public void Update() {
+
+    }
+
     @Override
     public void paintTo(Graphics g) {
         return;
