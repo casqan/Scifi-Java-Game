@@ -38,11 +38,16 @@ um die Nachbarn zu verändern und zu erhalten.
 
 ## Dungeon
 ### `Class Dungeon`
-Ein Dungeon erweitert die `class Graph<Room>`. Die Klasse Implementiert
+Ein Dungeon erweitert die `class Graph<Room>`. Die Klasse implementiert
 die Methode `generateDungeon()` um einen Dungeon zu generieren. Die
 Methode `generateDungeon()` erzeugt einen Graphen mit zufällig generierten
-Räumen.
+Räumen. Der grundlegende Algorithmus für die Generation des Dungeons kommt von 
+diesem Youtube Video: 
 
+https://www.youtube.com/watch?v=qAf9axsyijY
+
+Die Generation wurde jedoch um einige Features erweitert, so sind die Räume 
+dynamisch, entities die darin gespawnt werden.
 ### Algorithmus
 Der Algorithmus ist wie folgt aufgebaut:
 1. Erstelle einen leeren Graphen
@@ -71,3 +76,8 @@ Raum-Typen:
 Der Boss ist ein Statisches Entity in Form eines Kristalls, vom Kristall aus werden in einem bestimmten
 Abstand 5 Gegner gespawnt, die Bekämpft werden müssen, während der Kristall immer wider eine Schock-welle
 aussendet, die dem Spieler schaden zufügt, wenn er zu nah am Kristall ist.
+
+# Assets
+
+- Sprites: https://cainos.itch.io/pixel-art-top-down-basic
+- Player: https://rgsdev.itch.io/animated-top-down-character-base-template-in-pixel-art-rgsdev

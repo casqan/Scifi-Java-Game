@@ -269,13 +269,10 @@ public class Game2D implements Game{
         prefabs.put("enemy",enemy);
 
         //Setup Merchant
-        Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/idle.png",
-                new VertexInt(64,64),3),10,true);
-        Animation merchantDeath = new Animation(new SpriteSheet("sprites/merchant/walk.png",
-                new VertexInt(64,64),3),10,false);
+        Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/merchant_idle.png",
+                new VertexInt(32,32),4),4,true);
         var merchantAnimations = new HashMap<String,Animation>();
         merchantAnimations.put(EntityAction.IDLEPX,merchantIdle);
-        merchantAnimations.put(EntityAction.DEATH,merchantDeath);
         Entity merchant = new Entity(merchantAnimations,new Vertex(200,0),
                 new Vertex(60,134),50,6,new Vertex(0,0),2,EntityAction.IDLEPX);
         merchant.name = "merchant";
@@ -283,7 +280,6 @@ public class Game2D implements Game{
         //Spawn Enemies
         var list = new ArrayList<GameObj>();
         list.add(player);
-
         //Load key Prefab
         Animation keyAnimation = new Animation(new SpriteSheet("sprites/ui/key.png",
                 new VertexInt(16,16),4), 4,true);
