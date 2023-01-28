@@ -37,7 +37,7 @@ public interface Game{
 
   boolean won();
   boolean lost();
-  void destroy(GameObj go, String layer);
+  void Destroy(GameObj go, String layer);
 
   default boolean ended() {
     return won()||lost();

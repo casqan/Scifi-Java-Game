@@ -29,7 +29,7 @@ public class Game2D implements Game{
     public static final String L_ENTITIES = "L_ENTITIES";
     public static final String L_ENVIRONMENT = "L_ENV";
     public static final String L_STATICS = "L_STATICS";
-    public HashMap<String,Enemy> prefabs = new HashMap<>();
+    public static HashMap<String,GameObj> prefabs = new HashMap<>();
     public Key keyEntity;
     int width;
     int height;
@@ -106,6 +106,9 @@ public class Game2D implements Game{
     public void init() {
         GameTime.Init();
         instance = this;
+        activeObjects.put(L_ENTITIES,new ArrayList<>());
+        activeObjects.put(L_STATICS,new ArrayList<>());
+        activeObjects.put(L_ENVIRONMENT,new ArrayList<>());
 
         VertexInt playerSize = new VertexInt(64,64);
         int scale = 4;
@@ -279,7 +282,7 @@ public class Game2D implements Game{
 
         //Spawn Enemies
         var list = new ArrayList<GameObj>();
-        list.add(player);
+        Instantiate(L_ENTITIES,player);
         //Load key Prefab
         Animation keyAnimation = new Animation(new SpriteSheet("sprites/ui/key.png",
                 new VertexInt(16,16),4), 4,true);
@@ -290,16 +293,10 @@ public class Game2D implements Game{
             SpawnEnemy(enemy,new Vertex(random.nextInt(500),random.nextInt(500)));
         });
 
-        goss().put(L_ENTITIES, list);
         //for (int i = 0; i < 5; i++) SpawnEnemy(player2);
 
         //Build Map
         dungeonTileset = new Tileset("sprites/tileset/tileset.png",16,16);
-        //var TileMap = new Tilemap(dungeonTileset,tiles,1);
-        //var environment = new Environment(TileMap,new Vertex(0,0));
-        List<GameObj> env = new ArrayList<>();
-        //env.add(environment);
-        goss().put(L_ENVIRONMENT,env);
 
         try{
             InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavtt.ttf");
@@ -312,8 +309,18 @@ public class Game2D implements Game{
 
         GenerateDungeon();
         InputManager.RegisterOnKeyDown(VK_T, var -> GenerateDungeon());
-        var _boss = new Boss(new Vertex(200,200),16*4*16, 16*4*16,merchantIdle);
-        Instantiate(L_ENTITIES,_boss);
+
+        var bossIdleAnimation = new Animation(new SpriteSheet("sprites/boss/boss_idle.png",
+                new VertexInt(32,64),4), 4, true);
+        var bossDamageAnimation = new Animation(new SpriteSheet("sprites/boss/boss_damage.png",
+                new VertexInt(32,64),4), 4, false);
+        var bossAnimations = new HashMap<String,Animation>();
+        bossAnimations.put(EntityAction.IDLEPX,bossIdleAnimation);
+        bossAnimations.put("DAMAGE",bossDamageAnimation);
+        var _boss = new Boss(new Vertex(16*4*7,16*4*5),new Vertex(24,25*8),
+                9*8, 3*8,bossAnimations, enemy);
+        prefabs.put("END_BOSS",_boss);
+        Instantiate(L_ENTITIES, prefabs.get("END_BOSS"));
     }
 
     public void GenerateDungeon(){
@@ -339,7 +346,7 @@ public class Game2D implements Game{
 
     public void SpawnEnemy(Enemy enemy, Vertex pos){
             Enemy instance = new Enemy(enemy,pos);
-            instance.onDeath.AddListener((entity -> destroy(entity,L_ENTITIES)));
+            instance.onDeath.AddListener((entity -> Destroy(entity,L_ENTITIES)));
             goss().get(L_ENTITIES).add(instance);
     }
 
@@ -416,7 +423,7 @@ public class Game2D implements Game{
     }
 
     @Override
-    public void destroy(GameObj go, String layer) {
+    public void Destroy(GameObj go, String layer) {
         if (destroyQueue.contains(new Pair<>(layer,go))) return;
         destroyQueue.add(new Pair<>(layer,go));
     }

@@ -202,7 +202,7 @@ public class Room {
                     pos.y += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale - obj.anchor().y;
                     pos.x += tileset.tileWidth * tilemap.scale;
                     pos.y += tileset.tileWidth * tilemap.scale;
-                    var en = new Enemy(obj,pos);
+                    var en = new Enemy((Enemy) obj,pos);
                     enemies.add(en);
                     Instantiate(L_ENTITIES,en);
                 }

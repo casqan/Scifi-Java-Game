@@ -4,6 +4,7 @@ import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.animations.EntityAction;
+import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.core.GameTime;
 import net.casqan.scifigame.animations.Animation;
 
@@ -21,7 +22,8 @@ public class Enemy extends Character{
         super(og.animations, pos, og.anchor, og.width, og.height, og.velocity, og.speed, og.currentAction);
         this.maxHealth = og.maxHealth;
         this.health = og.maxHealth;
-        this.onDeath = og.onDeath;
+        this.onDeath = new Event<>();
+        this.onDeath.AddListener((e) -> Game2D.getInstance().Destroy(e,Game2D.L_ENTITIES));
         this.damage = og.damage;
     }
     @Override
@@ -43,7 +45,7 @@ public class Enemy extends Character{
 
     @Override
     public void Die() {
-        Game2D.getInstance().destroy(this,Game2D.L_ENTITIES);
+        Game2D.getInstance().Destroy(this,Game2D.L_ENTITIES);
         super.Die();
     }
 
