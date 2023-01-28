@@ -88,13 +88,11 @@ public class Boss extends Entity {
         screenPos = getScreenPos();
         var damageScreenPos = Camera.WorldToScreenPosition(indicatorPos);
         var gizmoPos = Camera.WorldToScreenPosition(Vertex.add(pos,anchor));
-
         if (enemyCount > 0) g.setColor(AOEDAMAGECOLOR);
         else if (nextSpawnTime - warningTime < GameTime.Time()) g.setColor(AOEWARNINGCOLOR);
-        if (enemyCount > 0 || nextSpawnTime - 5 < GameTime.Time()) {
+        if (enemyCount > 0 || nextSpawnTime - warningTime < GameTime.Time()) {
             g.fillOval((int)damageScreenPos.x,(int)damageScreenPos.y,(int)(attackRange * 2),(int)(attackRange * 2));
         }
-        g.drawString("EnemyCount: " + enemyCount,100,20);
         g.drawImage(animations.get(currentAction).GetCurrentFrame(),(int)screenPos.x,(int)screenPos.y,null);
         g.setColor(Color.gray);
         g.drawRect((int)gizmoPos.x,(int)gizmoPos.y,width,height);

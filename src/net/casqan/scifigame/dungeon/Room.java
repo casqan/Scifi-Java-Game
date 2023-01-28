@@ -184,6 +184,11 @@ public class Room {
         System.out.println(type);
         switch (type){
             case Boss:
+                var worldPos = new Vertex(
+                        position.x * width * tileset.tileWidth * tilemap.scale,
+                        position.y * height * tileset.tileHeight * tilemap.scale);
+                Instantiate(L_ENTITIES, prefabs.get("END_BOSS"),Vertex.add(new Vertex(16*4*7,16*4*5),worldPos));
+                break;
             case End:
                 break;
             case Merchant:

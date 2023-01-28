@@ -236,40 +236,65 @@ public class Game2D implements Game{
             System.out.println("====================================");
         });
 
-        var slimeAnimations = new HashMap<String,Animation>();
-        var slimeSize = new VertexInt(16,16);
-        Animation slimeIdle = new Animation(new SpriteSheet("sprites/slime/slimeidle.png",
-                slimeSize,scale), 8,true);
-        Animation slimeMove = new Animation(new SpriteSheet("sprites/slime/slimewalk.png",
-                slimeSize,scale), 8,true);
+        //Enemy Setup
+        Animation enemyIdlepx = new Animation(new SpriteSheet("sprites/enemy/enemy_idle_px.png",
+                playerSize,scale), 12,true);
+        Animation enemyIdlenx = new Animation(new SpriteSheet("sprites/enemy/enemy_idle_nx.png",
+                playerSize,scale), 12,true);
+        Animation enemyIdlepy = new Animation(new SpriteSheet("sprites/enemy/enemy_idle_py.png",
+                playerSize,scale), 12,true);
+        Animation enemyIdleny = new Animation(new SpriteSheet("sprites/enemy/enemy_idle_ny.png",
+                playerSize,scale), 12,true);
 
-        slimeAnimations.put(EntityAction.IDLEPX,slimeIdle);
-        slimeAnimations.put(EntityAction.IDLENX,slimeIdle);
-        slimeAnimations.put(EntityAction.IDLEPY,slimeIdle);
-        slimeAnimations.put(EntityAction.IDLENY,slimeIdle);
+        Animation enemywalkpx = new Animation(new SpriteSheet("sprites/enemy/enemy_walk_px.png",
+                playerSize,scale), 12,true);
+        Animation enemywalknx = new Animation(new SpriteSheet("sprites/enemy/enemy_walk_nx.png",
+                playerSize,scale), 12,true);
+        Animation enemywalkpy = new Animation(new SpriteSheet("sprites/enemy/enemy_walk_ny.png",
+                playerSize,scale), 12,true);
+        Animation enemywalkny = new Animation(new SpriteSheet("sprites/enemy/enemy_walk_py.png",
+                playerSize,scale), 12,true);
 
-        slimeAnimations.put(EntityAction.MOVEPX,slimeMove);
-        slimeAnimations.put(EntityAction.MOVENX,slimeMove);
-        slimeAnimations.put(EntityAction.MOVEPY,slimeMove);
-        slimeAnimations.put(EntityAction.MOVENY,slimeMove);
+        Animation enemyattackpx = new Animation(new SpriteSheet("sprites/enemy/enemy_attack_px.png",
+                playerSize,scale), 12,false);
+        Animation enemyattacknx = new Animation(new SpriteSheet("sprites/enemy/enemy_attack_nx.png",
+                playerSize,scale), 12,false);
+        Animation enemyattackpy = new Animation(new SpriteSheet("sprites/enemy/enemy_attack_ny.png",
+                playerSize,scale), 12,false);
+        Animation enemyattackny = new Animation(new SpriteSheet("sprites/enemy/enemy_attack_py.png",
+                playerSize,scale), 12,false);
 
-        slimeAnimations.put(EntityAction.ATTACKPX,slimeMove);
-        slimeAnimations.put(EntityAction.ATTACKNX,slimeMove);
-        slimeAnimations.put(EntityAction.ATTACKPY,slimeMove);
-        slimeAnimations.put(EntityAction.ATTACKNY,slimeMove);
+        /*Animation enemyDeath = new Animation( new SpriteSheet("sprites/enemy/death.png",
+                playerSize,scale), 12,false);*/
 
-        slimeAnimations.put(EntityAction.DEATH,slimeIdle);
+        var enemyAnimations = new HashMap<String,Animation>();
 
-        //Create Enemy Prefab
-        Enemy slime = new Enemy(slimeAnimations,new Vertex(0,0),
-                new Vertex(8,40),52,16,new Vertex(0,0),1.5f,EntityAction.IDLEPX);
-        //slime.onDeath.AddListener((entity -> goss().get(L_ENTITIES).remove(entity)));
-        slime.maxHealth = 20;
+        enemyAnimations.put(EntityAction.IDLEPX,enemyIdlepx);
+        enemyAnimations.put(EntityAction.IDLENX,enemyIdlenx);
+        enemyAnimations.put(EntityAction.IDLEPY,enemyIdlepy);
+        enemyAnimations.put(EntityAction.IDLENY,enemyIdleny);
 
-        Enemy enemy = new Enemy(playerAnimations,new Vertex(0,0),
+        enemyAnimations.put(EntityAction.MOVEPX,enemywalkpx);
+        enemyAnimations.put(EntityAction.MOVENX,enemywalknx);
+        enemyAnimations.put(EntityAction.MOVEPY,enemywalkpy);
+        enemyAnimations.put(EntityAction.MOVENY,enemywalkny);
+
+        enemyAnimations.put(EntityAction.ATTACKPX,enemyattackpx);
+        enemyAnimations.put(EntityAction.ATTACKNX,enemyattacknx);
+        enemyAnimations.put(EntityAction.ATTACKPY,enemyattackpy);
+        enemyAnimations.put(EntityAction.ATTACKNY,enemyattackny);
+
+        enemyAnimations.put(EntityAction.DEATH,playerDeath);
+
+        Enemy enemy = new Enemy(enemyAnimations,new Vertex(0,0),
                 new Vertex(112,132),32,16,new Vertex(0,0),1.5f,EntityAction.IDLEPX);
         enemy.maxHealth = 20;
         prefabs.put("enemy",enemy);
+
+        //!DEBUG
+        InputManager.RegisterOnKeyDown(VK_E,(key) -> {
+            SpawnEnemy(enemy,new Vertex(random.nextInt(500),random.nextInt(500)));
+        });
 
         //Setup Merchant
         Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/merchant_idle.png",
@@ -279,6 +304,7 @@ public class Game2D implements Game{
         Entity merchant = new Entity(merchantAnimations,new Vertex(200,0),
                 new Vertex(60,134),50,6,new Vertex(0,0),2,EntityAction.IDLEPX);
         merchant.name = "merchant";
+        Instantiate(L_ENTITIES,merchant);
 
         //Spawn Enemies
         var list = new ArrayList<GameObj>();
@@ -287,11 +313,6 @@ public class Game2D implements Game{
         Animation keyAnimation = new Animation(new SpriteSheet("sprites/ui/key.png",
                 new VertexInt(16,16),4), 4,true);
         keyEntity = new Key(keyAnimation,Vertex.zero,Vertex.zero,64,64);
-
-        //!DEBUG
-        InputManager.RegisterOnKeyDown(VK_E,(key) -> {
-            SpawnEnemy(enemy,new Vertex(random.nextInt(500),random.nextInt(500)));
-        });
 
         //for (int i = 0; i < 5; i++) SpawnEnemy(player2);
 
@@ -310,6 +331,7 @@ public class Game2D implements Game{
         GenerateDungeon();
         InputManager.RegisterOnKeyDown(VK_T, var -> GenerateDungeon());
 
+        //Boss Setup
         var bossIdleAnimation = new Animation(new SpriteSheet("sprites/boss/boss_idle.png",
                 new VertexInt(32,64),4), 4, true);
         var bossDamageAnimation = new Animation(new SpriteSheet("sprites/boss/boss_damage.png",
@@ -320,7 +342,6 @@ public class Game2D implements Game{
         var _boss = new Boss(new Vertex(16*4*7,16*4*5),new Vertex(24,25*8),
                 9*8, 3*8,bossAnimations, enemy);
         prefabs.put("END_BOSS",_boss);
-        Instantiate(L_ENTITIES, prefabs.get("END_BOSS"));
     }
 
     public void GenerateDungeon(){
@@ -491,6 +512,10 @@ public class Game2D implements Game{
         }*/
         g.drawString(String.format("Seed: " + seed),
                 4,height-4);
+        g.setColor(Color.magenta);
+        g.fillRect(width / 2 - 200, 8, 400,16);
+        g.setColor(Color.white);
+        g.drawString("Corrupted Crystal",width / 2 - 75, 40);
     }
 
     @Override
