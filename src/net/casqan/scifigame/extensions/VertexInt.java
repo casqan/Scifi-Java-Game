@@ -37,6 +37,14 @@ public class VertexInt {
     }
 
     @Override
+    public String toString() {
+        return "VertexInt{" +
+                "x=" + x +
+                ", y=" + y +
+                '}';
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof VertexInt instance)) return false;
         return instance.x == x && instance.y == y;

@@ -1,4 +1,5 @@
-package net.casqan.scifigame;
+import net.casqan.scifigame.Game2D;
+import net.casqan.scifigame.Launcher;
 
 public class Main{
     public static void main(String[] args) {

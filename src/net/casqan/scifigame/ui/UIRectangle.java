@@ -1,14 +1,20 @@
 package net.casqan.scifigame.ui;
 
+import name.panitz.game2d.Vertex;
+import net.casqan.scifigame.extensions.Rect;
+
 import java.awt.*;
 
 public class UIRectangle extends UIComponent{
-    public UIStyle style;
+
+    public UIRectangle(Rect rect, Vertex anchor, UIStyle style) {
+        super(rect,anchor,style);
+    }
 
     @Override
     public void paintTo(Graphics g) {
-        super.paintTo(g);
+        asp = GenerateAnchoredPosition();
         g.setColor(style.backgroundColor);
-        g.drawRect((int)rect.x(), (int)rect.y(), (int)rect.width(), (int)rect.height());
+        g.fillRect(asp.x, asp.y, (int)rect.width(), (int)rect.height());
     }
 }

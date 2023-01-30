@@ -1,6 +1,7 @@
 package net.casqan.scifigame;
 
 import javax.swing.*;
+import java.awt.*;
 
 public class Launcher extends JFrame {
 
@@ -8,16 +9,8 @@ public class Launcher extends JFrame {
     int height;
 
     public void Open(){
-        var g = getGraphics();
-        JTextField textField = new JTextField();
-        textField.addActionListener((event) -> {
-            switch (event.getActionCommand()) {
-                case "":
-                    
-                    break;
-                default:
-                    break;
-            }
-        });
+        setSize(600,400);
+        pack();
+        setVisible(true);
     }
 }

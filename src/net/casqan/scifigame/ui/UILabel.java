@@ -1,14 +1,17 @@
 package net.casqan.scifigame.ui;
 
+import name.panitz.game2d.Vertex;
+import net.casqan.scifigame.extensions.Rect;
+import net.casqan.scifigame.extensions.VertexInt;
+
 import java.awt.*;
 
 public class UILabel extends UIComponent{
     String content;
     public UIStyle style;
-    public UILabel() {
-        super();
-        style = UIStyle.DEFAULT;
-    }
+    public UILabel(Rect rect, Vertex anchor, UIStyle style){
+        super(rect,anchor,style);
+    };
     public void SetContent(String content){ content = this.content; }
     public String Content(){ return content; }
 

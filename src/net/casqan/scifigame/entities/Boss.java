@@ -1,5 +1,6 @@
 package net.casqan.scifigame.entities;
 
+import name.panitz.game2d.Game;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.animations.Animation;
@@ -32,6 +33,7 @@ public class Boss extends Entity {
         setpos(pos);
         animations.get("DAMAGE").onAnimationEnd.AddListener((var) -> currentAction = EntityAction.IDLEPX);
         onDeath.AddListener((entity -> Game2D.getInstance().won()));
+        onDeath.AddListener((entity -> Game2D.getInstance().Destroy(entity,Layers.L_ENTITIES)));
         health = 500;
     }
 
@@ -84,6 +86,9 @@ public class Boss extends Entity {
         System.out.println("Hit Boss!");
         health -= damage;
         currentAction = "DAMAGE";
+        if (health <= 0) {
+            onDeath.Invoke(this);
+        }
     }
 
     @Override

@@ -202,14 +202,15 @@ public class Room {
                 var count = Random().nextInt(5,10);
                 List<Enemy> enemies = new ArrayList<>();
                 for (int i = 0;i < count;i++){
+                    var sf = tileset.tileWidth * tilemap.scale;//scaling factor
                     var pos = new Vertex(
-                            position.x * width * tileset.tileWidth * tilemap.scale,
-                        position.y * height * tileset.tileHeight * tilemap.scale);
+                            position.x * width * sf,
+                        position.y * height * sf);
                     var obj = PREFABS.get("enemy");
-                    pos.x += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale - obj.anchor().x;
-                    pos.y += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale - obj.anchor().y;
-                    pos.x += tileset.tileWidth * tilemap.scale;
-                    pos.y += tileset.tileWidth * tilemap.scale;
+                    pos.x += Random().nextFloat() * (height - 3) * sf - obj.anchor().x;
+                    pos.y += Random().nextFloat() * (width - 3) * sf - obj.anchor().y;
+                    pos.x += sf;
+                    pos.y += sf;
                     var en = new Enemy((Enemy) obj,pos);
                     enemies.add(en);
                     Instantiate(Layers.L_ENTITIES,en);

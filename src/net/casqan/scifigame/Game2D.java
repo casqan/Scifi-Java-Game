@@ -17,10 +17,13 @@ import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.sprite.*;
 import net.casqan.scifigame.tilesystem.Tileset;
 import net.casqan.scifigame.ui.UIComponent;
+import net.casqan.scifigame.ui.UIRectangle;
+import net.casqan.scifigame.ui.UIStyle;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.io.InputStream;
+import java.sql.SQLType;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,7 +56,7 @@ public class Game2D implements Game{
     public static Random Random() {return random;}
     public Tileset dungeonTileset;
 
-    Game2D(int width, int height, int seed){
+    public Game2D(int width, int height, int seed){
         instance = this;
         GameTime.Init();
         activeObjects = new HashMap<>();
@@ -167,7 +170,7 @@ public class Game2D implements Game{
         _player.onDeath.Clear();
         _player.name = "player";
         _player.health = 200;
-        _player.keys = 100;
+        _player.keys = 0;
         SetPlayer(_player);
 
         camera = new Camera();
@@ -343,6 +346,10 @@ public class Game2D implements Game{
         var _boss = new Boss(new Vertex(16*4*7,16*4*5),new Vertex(24,25*8),
                 9*8, 3*8,bossAnimations, enemy);
         PREFABS.put("END_BOSS",_boss);
+        var winScreen = new UIRectangle(new Rect(-100,-100,200,200),
+                new Vertex(1,0),
+                new UIStyle());
+        Instantiate(Layers.L_UI,winScreen);
     }
 
     public void GenerateDungeon(){
@@ -436,7 +443,11 @@ public class Game2D implements Game{
 
     @Override
     public boolean won() {
-        return false;
+        var winScreen = new UIRectangle(new Rect(-100,-100,200,200),
+                new Vertex(0.5,0.5),
+                UIStyle.DEFAULT);
+        Instantiate(Layers.L_UI,winScreen);
+        return true;
     }
 
     @Override
@@ -467,9 +478,9 @@ public class Game2D implements Game{
 
         //Sort by y-Coordinate
         goss().put(Layers.L_ENTITIES,
-                goss().get(Layers.L_ENTITIES).stream()                      //Convert to Stream
-                .sorted(Comparator.comparingInt(GameObj::getZIndex)) //Compare Z-Index
-                .collect(Collectors.toList()));                      //Convert back to List
+                goss().get(Layers.L_ENTITIES).stream()                  //Convert to Stream
+                .sorted(Comparator.comparingInt(GameObj::getZIndex))    //Compare Z-Index
+                .collect(Collectors.toList()));                         //Convert back to List
 
         //Draw all StaticObjects
         for (var go : goss().get(Layers.L_ENVIRONMENT)) go.paintTo(g);
@@ -505,7 +516,7 @@ public class Game2D implements Game{
                 width - 200,96);
         g.drawString(String.format("Keys: %d", player.keys),
                 width - 200,112);
-        g.drawString(String.format("Entities: "),
+        g.drawString("Entities: ",
                 0,16);
        for(int i = 0; i < goss().get(Layers.L_ENTITIES).size(); i++){
             var o = goss().get(Layers.L_ENTITIES).get(i);
