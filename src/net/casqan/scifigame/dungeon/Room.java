@@ -4,6 +4,7 @@ import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.core.Event;
+import net.casqan.scifigame.core.Layers;
 import net.casqan.scifigame.entities.Enemy;
 import net.casqan.scifigame.entities.Key;
 import net.casqan.scifigame.extensions.VertexInt;
@@ -160,12 +161,12 @@ public class Room {
         }
 
         for(GameObj wall : walls){
-            Instantiate(L_STATICS,wall);
+            Instantiate(Layers.L_STATICS,wall);
         }
         for (var door : doors){
-            Instantiate(L_STATICS,door);
+            Instantiate(Layers.L_STATICS,door);
         }
-        Instantiate(L_ENVIRONMENT,environment);
+        Instantiate(Layers.L_ENVIRONMENT,environment);
         Populate();
     }
 
@@ -188,7 +189,7 @@ public class Room {
             case Boss:
                 var _pos = Vertex.add(new Vertex(16*4*7,16*4*5),worldPos);
                 PREFABS.get("END_BOSS").setpos(_pos);
-                Instantiate(L_ENTITIES, PREFABS.get("END_BOSS"),_pos);
+                Instantiate(Layers.L_ENTITIES, PREFABS.get("END_BOSS"),_pos);
                 PREFABS.get("END_BOSS").setpos(_pos);
                 break;
             case End:
@@ -211,12 +212,12 @@ public class Room {
                     pos.y += tileset.tileWidth * tilemap.scale;
                     var en = new Enemy((Enemy) obj,pos);
                     enemies.add(en);
-                    Instantiate(L_ENTITIES,en);
+                    Instantiate(Layers.L_ENTITIES,en);
                 }
                 for (int i = 0; i < doors.size(); i++){
                     enemies.get(i).onDeath = new Event<>();
                     enemies.get(i).onDeath.AddListener((var) -> {
-                        Instantiate(L_ENTITIES,
+                        Instantiate(Layers.L_ENTITIES,
                                 new Key(getInstance().keyEntity,
                                         Vertex.add(var.pos,var.anchor)));
                     });
@@ -236,7 +237,7 @@ public class Room {
             pos.y += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale;
             pos.x += tileset.tileWidth * tilemap.scale;
             pos.y += tileset.tileWidth * tilemap.scale;
-            Instantiate(L_ENTITIES,new Key(getInstance().keyEntity,pos));
+            Instantiate(Layers.L_ENTITIES,new Key(getInstance().keyEntity,pos));
         }
     }
 }

@@ -11,10 +11,12 @@ public class SwingScreen extends JPanel implements ComponentListener{
   private static final long serialVersionUID = 1403492898373497054L;
   Game logic;
   Timer t;
+  Dimension dimension;
 
   public SwingScreen(Game gl) {
     this.logic = gl;
     this.addComponentListener(this);
+    dimension = new Dimension((int)logic.width(),(int)logic.height());
 
     t = new Timer(13, (ev)->{
         logic.move();
@@ -45,9 +47,14 @@ public class SwingScreen extends JPanel implements ComponentListener{
       requestFocus();
     }
 
-	
-  @Override public Dimension getPreferredSize() {
-    return new Dimension((int)logic.width(),(int)logic.height());
+    @Override
+    public void setSize(Dimension d) {
+        super.setSize(d);
+        dimension = d;
+    }
+
+    @Override public Dimension getPreferredSize() {
+        return dimension;
   }
 
 	
