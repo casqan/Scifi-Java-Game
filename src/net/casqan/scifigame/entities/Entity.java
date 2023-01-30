@@ -13,6 +13,7 @@ import java.awt.*;
 import java.util.HashMap;
 
 public class Entity extends AbstractGameObj implements Cloneable{
+    public Statistics statistics = new Statistics();
 
     public Vertex pos;
     public Vertex velocity;

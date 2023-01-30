@@ -1,6 +1,7 @@
 package name.panitz.game2d;
 public interface GameObj{
   Vertex pos();
+  default void setpos(Vertex position){};
   Vertex velocity();
   Vertex anchor();
   double width();

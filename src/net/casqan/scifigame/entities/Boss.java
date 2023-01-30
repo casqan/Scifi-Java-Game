@@ -33,14 +33,21 @@ public class Boss extends Entity {
     public Boss(Vertex pos,Vertex anchor, int width, int height, HashMap<String,Animation> animations, Enemy guardian) {
         super(animations,pos,anchor,width,height,Vertex.zero,0f,EntityAction.IDLEPX);
         this.guardian = guardian;
+        setpos(pos);
+        animations.get("DAMAGE").onAnimationEnd.AddListener((var) -> currentAction = EntityAction.IDLEPX);
+        onDeath.AddListener((entity -> Game2D.getInstance().won()));
+        health = 32000;
+    }
+
+    @Override
+    public void setpos(Vertex position) {
+        super.setpos(position);
         damagePos = new Vertex(0,0);
         damagePos.add(new Vertex(width / 2f, height / 2f));
         damagePos.add(pos);
         damagePos.add(anchor);
         indicatorPos = new Vertex(damagePos);
         indicatorPos.add(new Vertex(-attackRange, -attackRange));
-        animations.get("DAMAGE").onAnimationEnd.AddListener((var) -> currentAction = EntityAction.IDLEPX);
-        onDeath.AddListener((entity -> Game2D.getInstance().won()));
     }
 
     ///Handle with care!
@@ -96,5 +103,9 @@ public class Boss extends Entity {
         g.drawImage(animations.get(currentAction).GetCurrentFrame(),(int)screenPos.x,(int)screenPos.y,null);
         g.setColor(Color.gray);
         g.drawRect((int)gizmoPos.x,(int)gizmoPos.y,width,height);
+        g.drawString("Guardians: " + enemyCount,0 ,64);
+        g.drawString("nextSpawnTime: " + nextSpawnTime,0 ,64 + 16);
+        g.drawString("nextDamageTime: " + nextDamageTime,0 ,64 + 32);
+        g.drawString("damagePos " + damagePos,0 ,64 + 48);
     }
 }

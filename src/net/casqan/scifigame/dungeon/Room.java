@@ -1,6 +1,5 @@
 package net.casqan.scifigame.dungeon;
 
-import name.panitz.game2d.Game;
 import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
@@ -182,12 +181,15 @@ public class Room {
             }
         }
         System.out.println(type);
+        var worldPos = new Vertex(
+                position.x * width * tileset.tileWidth * tilemap.scale,
+                position.y * height * tileset.tileHeight * tilemap.scale);
         switch (type){
             case Boss:
-                var worldPos = new Vertex(
-                        position.x * width * tileset.tileWidth * tilemap.scale,
-                        position.y * height * tileset.tileHeight * tilemap.scale);
-                Instantiate(L_ENTITIES, prefabs.get("END_BOSS"),Vertex.add(new Vertex(16*4*7,16*4*5),worldPos));
+                var _pos = Vertex.add(new Vertex(16*4*7,16*4*5),worldPos);
+                PREFABS.get("END_BOSS").setpos(_pos);
+                Instantiate(L_ENTITIES, PREFABS.get("END_BOSS"),_pos);
+                PREFABS.get("END_BOSS").setpos(_pos);
                 break;
             case End:
                 break;
@@ -202,7 +204,7 @@ public class Room {
                     var pos = new Vertex(
                             position.x * width * tileset.tileWidth * tilemap.scale,
                         position.y * height * tileset.tileHeight * tilemap.scale);
-                    var obj = getInstance().prefabs.get("enemy");
+                    var obj = PREFABS.get("enemy");
                     pos.x += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale - obj.anchor().x;
                     pos.y += Random().nextFloat() * (width - 2) * tileset.tileWidth * tilemap.scale - obj.anchor().y;
                     pos.x += tileset.tileWidth * tilemap.scale;

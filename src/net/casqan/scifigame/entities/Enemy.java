@@ -39,7 +39,7 @@ public class Enemy extends Character{
         var player = Game2D.getInstance().player();
         var v = Vertex.sub(Vertex.add(player.pos(),player.anchor()),Vertex.add(pos(),anchor()));
         v = v.mult(1d / v.magnitude());
-        velocity = v;
+        velocity = v.mult(statistics.getOrDefault(Statistics.SPEED,1D));
         super.move();
     }
 

@@ -29,7 +29,7 @@ public class Game2D implements Game{
     public static final String L_ENTITIES = "L_ENTITIES";
     public static final String L_ENVIRONMENT = "L_ENV";
     public static final String L_STATICS = "L_STATICS";
-    public static HashMap<String,GameObj> prefabs = new HashMap<>();
+    public static HashMap<String,GameObj> PREFABS = new HashMap<>();
     public Key keyEntity;
     int width;
     int height;
@@ -226,12 +226,13 @@ public class Game2D implements Game{
             var r = new Rect(pos,size);
             //Gizmos.Add(new Gizmo(r,Color.red));
             var col = Physics.OverlapRect(r,damageLayers);
+            var damage = (int) Math.round(player().statistics.getOrDefault(Statistics.DAMAGE,10d));
             for (var go : col){
                 System.out.println("Overlap with: " + go.name());
                 if (go == player) continue;
                 System.out.println(go instanceof Entity);
                 if (!(go instanceof Entity)) continue;
-                ((Entity)go).DealDamage(10);
+                ((Entity)go).DealDamage(damage);
             }
             System.out.println("====================================");
         });
@@ -289,7 +290,7 @@ public class Game2D implements Game{
         Enemy enemy = new Enemy(enemyAnimations,new Vertex(0,0),
                 new Vertex(112,132),32,16,new Vertex(0,0),1.5f,EntityAction.IDLEPX);
         enemy.maxHealth = 20;
-        prefabs.put("enemy",enemy);
+        PREFABS.put("enemy",enemy);
 
         //!DEBUG
         InputManager.RegisterOnKeyDown(VK_E,(key) -> {
@@ -317,7 +318,7 @@ public class Game2D implements Game{
         //for (int i = 0; i < 5; i++) SpawnEnemy(player2);
 
         //Build Map
-        dungeonTileset = new Tileset("sprites/tileset/tileset.png",16,16);
+        dungeonTileset = new Tileset("sprites/tileset/dungeontiles.png",16,16);
 
         try{
             InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavtt.ttf");
@@ -341,13 +342,13 @@ public class Game2D implements Game{
         bossAnimations.put("DAMAGE",bossDamageAnimation);
         var _boss = new Boss(new Vertex(16*4*7,16*4*5),new Vertex(24,25*8),
                 9*8, 3*8,bossAnimations, enemy);
-        prefabs.put("END_BOSS",_boss);
+        PREFABS.put("END_BOSS",_boss);
     }
 
     public void GenerateDungeon(){
         Gizmos.Clear();
         seed = new Random().nextInt();
-        Dungeon dungeon = Dungeon.Generate(seed,6,3,15,8,
+        Dungeon dungeon = Dungeon.Generate(seed,1,1,2,2,
                 16,16,0,dungeonTileset);
         activeObjects.get(L_ENVIRONMENT).clear();
         activeObjects.get(L_STATICS).clear();
