@@ -120,7 +120,7 @@ public class Entity extends AbstractGameObj implements Cloneable{
     public void Die(){
         SetCurrentAction(EntityAction.DEATH);
         animations.get(EntityAction.DEATH).onAnimationEnd.AddListener(
-                (var) -> Game2D.getInstance().goss().get(Game2D.L_ENTITIES).remove(this));
+                (var) -> Game2D.getInstance().goss().get(Layers.L_ENTITIES).remove(this));
     }
 
     @Override

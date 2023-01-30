@@ -5,6 +5,7 @@ import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.animations.Animation;
 import net.casqan.scifigame.animations.EntityAction;
+import net.casqan.scifigame.core.Layers;
 
 import java.util.HashMap;
 
@@ -31,7 +32,7 @@ public class Key extends Entity {
     public void onCollision(GameObj that) {
         if (that instanceof Player player){
             player.keys++;
-            Game2D.getInstance().Destroy(this,Game2D.L_ENTITIES);
+            Game2D.getInstance().Destroy(this, Layers.L_ENTITIES);
         }
     }
 }

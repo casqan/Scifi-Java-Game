@@ -7,6 +7,7 @@ import net.casqan.scifigame.animations.EntityAction;
 import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.core.GameTime;
 import net.casqan.scifigame.animations.Animation;
+import net.casqan.scifigame.core.Layers;
 
 import java.util.HashMap;
 
@@ -23,7 +24,7 @@ public class Enemy extends Character{
         this.maxHealth = og.maxHealth;
         this.health = og.maxHealth;
         this.onDeath = new Event<>();
-        this.onDeath.AddListener((e) -> Game2D.getInstance().Destroy(e,Game2D.L_ENTITIES));
+        this.onDeath.AddListener((e) -> Game2D.getInstance().Destroy(e, Layers.L_ENTITIES));
         this.damage = og.damage;
     }
     @Override
@@ -45,7 +46,7 @@ public class Enemy extends Character{
 
     @Override
     public void Die() {
-        Game2D.getInstance().Destroy(this,Game2D.L_ENTITIES);
+        Game2D.getInstance().Destroy(this, Layers.L_ENTITIES);
         super.Die();
     }
 

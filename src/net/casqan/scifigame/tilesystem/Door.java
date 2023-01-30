@@ -3,6 +3,7 @@ package net.casqan.scifigame.tilesystem;
 import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
+import net.casqan.scifigame.core.Layers;
 import net.casqan.scifigame.dungeon.Node;
 import net.casqan.scifigame.dungeon.Room;
 
@@ -33,6 +34,6 @@ public class Door extends Wall {
         if (player.Keys() < 1) return;
         node.data.BuildRoom();
         Game2D.getInstance().player().keys -= 1;
-        Game2D.getInstance().Destroy(this,Game2D.L_STATICS);
+        Game2D.getInstance().Destroy(this, Layers.L_STATICS);
     }
 }

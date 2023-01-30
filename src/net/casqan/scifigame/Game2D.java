@@ -5,6 +5,7 @@ import net.casqan.scifigame.animations.Animation;
 import net.casqan.scifigame.animations.EntityAction;
 import net.casqan.scifigame.core.Camera;
 import net.casqan.scifigame.core.GameTime;
+import net.casqan.scifigame.core.Layers;
 import net.casqan.scifigame.entities.*;
 import net.casqan.scifigame.extensions.Pair;
 import net.casqan.scifigame.extensions.Physics;
@@ -15,6 +16,7 @@ import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.sprite.*;
 import net.casqan.scifigame.tilesystem.Tileset;
+import net.casqan.scifigame.ui.UIComponent;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -26,9 +28,6 @@ import java.util.stream.Collectors;
 import static java.awt.event.KeyEvent.*;
 
 public class Game2D implements Game{
-    public static final String L_ENTITIES = "L_ENTITIES";
-    public static final String L_ENVIRONMENT = "L_ENV";
-    public static final String L_STATICS = "L_STATICS";
     public static HashMap<String,GameObj> PREFABS = new HashMap<>();
     public Key keyEntity;
     int width;
@@ -58,8 +57,8 @@ public class Game2D implements Game{
         instance = this;
         GameTime.Init();
         activeObjects = new HashMap<>();
-        activeObjects.put(L_STATICS,new ArrayList<>());
-        activeObjects.put(L_ENTITIES,new ArrayList<>());
+        activeObjects.put(Layers.L_STATICS,new ArrayList<>());
+        activeObjects.put(Layers.L_ENTITIES,new ArrayList<>());
         this.width = width;
         this.height = height;
         screen = new VertexInt(width/2,height/2);
@@ -106,9 +105,10 @@ public class Game2D implements Game{
     public void init() {
         GameTime.Init();
         instance = this;
-        activeObjects.put(L_ENTITIES,new ArrayList<>());
-        activeObjects.put(L_STATICS,new ArrayList<>());
-        activeObjects.put(L_ENVIRONMENT,new ArrayList<>());
+        activeObjects.put(Layers.L_ENTITIES,new ArrayList<>());
+        activeObjects.put(Layers.L_STATICS,new ArrayList<>());
+        activeObjects.put(Layers.L_ENVIRONMENT,new ArrayList<>());
+        activeObjects.put(Layers.L_UI,new ArrayList<>());
 
         VertexInt playerSize = new VertexInt(64,64);
         int scale = 4;
@@ -194,7 +194,7 @@ public class Game2D implements Game{
         InputManager.RegisterOnKeyDown(VK_R,(key) -> Gizmos.Clear());
 
         damageLayers = new HashSet<>();
-        damageLayers.add(L_ENTITIES);
+        damageLayers.add(Layers.L_ENTITIES);
         InputManager.RegisterOnKeyDown(VK_SPACE,(key) -> {
             if (player.attacking) return;
             System.out.println("==================ATTACK DATA==================");
@@ -305,11 +305,11 @@ public class Game2D implements Game{
         Entity merchant = new Entity(merchantAnimations,new Vertex(200,0),
                 new Vertex(60,134),50,6,new Vertex(0,0),2,EntityAction.IDLEPX);
         merchant.name = "merchant";
-        Instantiate(L_ENTITIES,merchant);
+        Instantiate(Layers.L_ENTITIES,merchant);
 
         //Spawn Enemies
         var list = new ArrayList<GameObj>();
-        Instantiate(L_ENTITIES,player);
+        Instantiate(Layers.L_ENTITIES,player);
         //Load key Prefab
         Animation keyAnimation = new Animation(new SpriteSheet("sprites/ui/key.png",
                 new VertexInt(16,16),4), 4,true);
@@ -348,10 +348,10 @@ public class Game2D implements Game{
     public void GenerateDungeon(){
         Gizmos.Clear();
         seed = new Random().nextInt();
-        Dungeon dungeon = Dungeon.Generate(seed,1,1,2,2,
+        Dungeon dungeon = Dungeon.Generate(seed,1,1,1,1,
                 16,16,0,dungeonTileset);
-        activeObjects.get(L_ENVIRONMENT).clear();
-        activeObjects.get(L_STATICS).clear();
+        activeObjects.get(Layers.L_ENVIRONMENT).clear();
+        activeObjects.get(Layers.L_STATICS).clear();
         player.pos = new Vertex(0,0);
 
         int offset = 0;
@@ -368,8 +368,8 @@ public class Game2D implements Game{
 
     public void SpawnEnemy(Enemy enemy, Vertex pos){
             Enemy instance = new Enemy(enemy,pos);
-            instance.onDeath.AddListener((entity -> Destroy(entity,L_ENTITIES)));
-            goss().get(L_ENTITIES).add(instance);
+            instance.onDeath.AddListener((entity -> Destroy(entity, Layers.L_ENTITIES)));
+            goss().get(Layers.L_ENTITIES).add(instance);
     }
 
     void _Instantiate(String layer, GameObj obj,Vertex pos){
@@ -386,14 +386,14 @@ public class Game2D implements Game{
     @Override
     public void move() {
         camera.pos = Vertex.Lerp(camera.pos,Vertex.add(player.pos,player.anchor),GameTime.DeltaTime() * 3);
-        for (GameObj go : goss().get(L_ENTITIES)) {
+        for (GameObj go : goss().get(Layers.L_ENTITIES)) {
             go.move();
             //We save some Performance, by only checking for collisions with the Player
             //This is because the Player is the only Entity that needs to collide with other Entities
             if (go != player && go.touches(player)) go.onCollision(player);
 
             //Checks for static objects like walls or doors still needs to be done for every Entity
-            for(var gostat : goss().get(L_STATICS)){
+            for(var gostat : goss().get(Layers.L_STATICS)){
                 if (go.touches(gostat)) {
                     go.onCollision(gostat);
                     gostat.onCollision(go);
@@ -466,15 +466,15 @@ public class Game2D implements Game{
         g.setColor(Color.white);
 
         //Sort by y-Coordinate
-        goss().put(L_ENTITIES,
-                goss().get(L_ENTITIES).stream()                      //Convert to Stream
+        goss().put(Layers.L_ENTITIES,
+                goss().get(Layers.L_ENTITIES).stream()                      //Convert to Stream
                 .sorted(Comparator.comparingInt(GameObj::getZIndex)) //Compare Z-Index
                 .collect(Collectors.toList()));                      //Convert back to List
 
         //Draw all StaticObjects
-        for (var go : goss().get(L_ENVIRONMENT)) go.paintTo(g);
-        for (var go : goss().get(L_STATICS)) go.paintTo(g);
-        for (var go : goss().get(L_ENTITIES))
+        for (var go : goss().get(Layers.L_ENVIRONMENT)) go.paintTo(g);
+        for (var go : goss().get(Layers.L_STATICS)) go.paintTo(g);
+        for (var go : goss().get(Layers.L_ENTITIES))
             try { go.paintTo(g); }
             catch (Exception e) {
                 System.out.println(e);
@@ -489,6 +489,7 @@ public class Game2D implements Game{
 
     public void PaintUI(Graphics g){
         g.setFont(font);
+        for (GameObj obj : activeObjects.get(Layers.L_UI)) obj.paintTo(g);
         g.setColor(Color.white);
         g.drawString(String.format("Time: %.2f", GameTime.Time()),
                 width - 200,16);
@@ -506,13 +507,12 @@ public class Game2D implements Game{
                 width - 200,112);
         g.drawString(String.format("Entities: "),
                 0,16);
-       /*for(int i = 0; i < goss().get(L_ENTITIES).size(); i++){
-            var o = goss().get(L_ENTITIES).get(i);
+       for(int i = 0; i < goss().get(Layers.L_ENTITIES).size(); i++){
+            var o = goss().get(Layers.L_ENTITIES).get(i);
             g.drawString(String.format(o.name() + "|" + String.format("x:%.2f",o.pos().x) +
                     " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 2));
-        }*/
-        g.drawString(String.format("Seed: " + seed),
-                4,height-4);
+        }
+        g.drawString(String.format("Seed: " + seed), 4,height-4);
         g.setColor(Color.magenta);
         g.fillRect(width / 2 - 200, 8, 400,16);
         g.setColor(Color.white);

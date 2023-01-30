@@ -1,17 +1,13 @@
 package net.casqan.scifigame.entities;
 
-import jdk.jfr.Percentage;
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.animations.Animation;
 import net.casqan.scifigame.animations.EntityAction;
 import net.casqan.scifigame.core.Camera;
 import net.casqan.scifigame.core.GameTime;
-import net.casqan.scifigame.core.GameTimer;
-import net.casqan.scifigame.sprite.SpriteAnimation;
-import net.casqan.scifigame.tilesystem.Wall;
+import net.casqan.scifigame.core.Layers;
 
-import javax.swing.plaf.InsetsUIResource;
 import java.awt.*;
 import java.util.HashMap;
 
@@ -36,7 +32,7 @@ public class Boss extends Entity {
         setpos(pos);
         animations.get("DAMAGE").onAnimationEnd.AddListener((var) -> currentAction = EntityAction.IDLEPX);
         onDeath.AddListener((entity -> Game2D.getInstance().won()));
-        health = 32000;
+        health = 500;
     }
 
     @Override
@@ -75,7 +71,7 @@ public class Boss extends Entity {
         spawnPos.add(guardian.anchor.mult(-1));
         var instance = new Enemy(guardian,spawnPos);
         instance.onDeath.AddListener(entity -> enemyCount--);
-        Game2D.Instantiate(Game2D.L_ENTITIES,instance);
+        Game2D.Instantiate(Layers.L_ENTITIES,instance);
     }
 
     public void CheckForMinionAlive(){
@@ -101,6 +97,8 @@ public class Boss extends Entity {
             g.fillOval((int)damageScreenPos.x,(int)damageScreenPos.y,(int)(attackRange * 2),(int)(attackRange * 2));
         }
         g.drawImage(animations.get(currentAction).GetCurrentFrame(),(int)screenPos.x,(int)screenPos.y,null);
+        g.setColor(Color.WHITE);
+        g.drawString("" + health,(int)screenPos.x,(int)screenPos.y);
         g.setColor(Color.gray);
         g.drawRect((int)gizmoPos.x,(int)gizmoPos.y,width,height);
         g.drawString("Guardians: " + enemyCount,0 ,64);
