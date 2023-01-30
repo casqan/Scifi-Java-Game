@@ -1,6 +1,7 @@
 package name.panitz.game2d;
 import net.casqan.scifigame.input.InputManager;
 
+import javax.sound.midi.Soundbank;
 import java.util.HashMap;
 import java.util.List;
 import java.awt.event.*;
@@ -53,25 +54,29 @@ public interface Game{
   default void play(){
     init();
     var f = new javax.swing.JFrame();
+    f.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+    var ss = new SwingScreen(this);
     InputManager.RegisterOnKeyDown(VK_F11,(var) ->{
+      Dimension dim = null;
       if(f.isUndecorated()){
         f.dispose();
         f.setUndecorated(false);
         f.setExtendedState(Frame.NORMAL);
-        f.setSize(new Dimension(width(),height()));
-        f.pack();
-        f.setVisible(true);
+        dim = new Dimension(1280,720);
       }else {
         f.dispose();
         f.setUndecorated(true);
         f.setExtendedState(Frame.MAXIMIZED_BOTH);
-        f.setSize(f.getToolkit().getScreenSize());
-        f.pack();
-        f.setVisible(true);
+        dim = f.getToolkit().getScreenSize().getSize();
+        System.out.println(dim.width);
+        System.out.println(dim.height);
       }
+      f.setSize(dim);
+      ss.setSize(dim);
+      f.pack();
+      f.setVisible(true);
     });
-    f.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
-    f.add(new SwingScreen(this));
+    f.add(ss);
     f.pack();
     f.setVisible(true);
   }
