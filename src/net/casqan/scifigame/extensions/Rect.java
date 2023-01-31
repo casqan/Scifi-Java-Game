@@ -4,8 +4,8 @@ import name.panitz.game2d.GameObj;
 import name.panitz.game2d.Vertex;
 
 public class Rect {
-    Vertex position;
-    Vertex dimensions;
+    public Vertex position;
+    public Vertex dimensions;
 
     public Vertex pos() { return position; }
     public void setPos(Vertex pos) { this.position = pos; }

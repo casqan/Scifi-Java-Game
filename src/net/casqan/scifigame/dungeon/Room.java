@@ -5,11 +5,17 @@ import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.core.Layers;
+import net.casqan.scifigame.entities.Boss;
 import net.casqan.scifigame.entities.Enemy;
 import net.casqan.scifigame.entities.Key;
+import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.tilesystem.*;
+import net.casqan.scifigame.ui.UILabel;
+import net.casqan.scifigame.ui.UIRectangle;
+import net.casqan.scifigame.ui.UIStyle;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -188,9 +194,21 @@ public class Room {
         switch (type){
             case Boss:
                 var _pos = Vertex.add(new Vertex(16*4*7,16*4*5),worldPos);
-                PREFABS.get("END_BOSS").setpos(_pos);
-                Instantiate(Layers.L_ENTITIES, PREFABS.get("END_BOSS"),_pos);
-                PREFABS.get("END_BOSS").setpos(_pos);
+                var boss = (Boss) PREFABS.get("END_BOSS");
+                Instantiate(Layers.L_ENTITIES, boss,_pos);
+                boss.setpos(_pos);
+                var bossUIStyle = new UIStyle();
+                bossUIStyle.backgroundColor = Color.magenta;
+                bossUIStyle.color = Color.white;
+                var bossHealthContainerStyle = new UIStyle();
+                bossHealthContainerStyle.backgroundColor = Color.black;
+                var healthContainer = new UIRectangle(new Rect(0,6,208,28),new Vertex(0.5,0),bossHealthContainerStyle);
+                var healthBar = new UIRectangle(new Rect(0,10,200,20),new Vertex(0.5,0),bossUIStyle);
+                var healthBarText = new UILabel("Corrupted Crystal",new Rect(-75,50,0,0),new Vertex(0.5,0),bossUIStyle);
+                Instantiate(Layers.L_UI,healthContainer);
+                Instantiate(Layers.L_UI,healthBar);
+                Instantiate(Layers.L_UI,healthBarText);
+                boss.onDamage.AddListener((b) -> healthBar.rect.dimensions.x = boss.health / 500f * 200);
                 break;
             case End:
                 break;

@@ -83,12 +83,8 @@ public class Boss extends Entity {
 
     @Override
     public void DealDamage(int damage) {
-        System.out.println("Hit Boss!");
-        health -= damage;
+        super.DealDamage(damage);
         currentAction = "DAMAGE";
-        if (health <= 0) {
-            onDeath.Invoke(this);
-        }
     }
 
     @Override

@@ -3,7 +3,7 @@ package net.casqan.scifigame.ui;
 import java.awt.*;
 
 public class UIStyle {
-    public final static UIStyle DEFAULT = new UIStyle();
+    public static UIStyle DEFAULT = new UIStyle();
 
     public UIStyle(){
         color = Color.white;

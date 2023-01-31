@@ -17,6 +17,7 @@ import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.sprite.*;
 import net.casqan.scifigame.tilesystem.Tileset;
 import net.casqan.scifigame.ui.UIComponent;
+import net.casqan.scifigame.ui.UILabel;
 import net.casqan.scifigame.ui.UIRectangle;
 import net.casqan.scifigame.ui.UIStyle;
 
@@ -346,10 +347,6 @@ public class Game2D implements Game{
         var _boss = new Boss(new Vertex(16*4*7,16*4*5),new Vertex(24,25*8),
                 9*8, 3*8,bossAnimations, enemy);
         PREFABS.put("END_BOSS",_boss);
-        var winScreen = new UIRectangle(new Rect(-100,-100,200,200),
-                new Vertex(1,0),
-                new UIStyle());
-        Instantiate(Layers.L_UI,winScreen);
     }
 
     public void GenerateDungeon(){
@@ -443,10 +440,23 @@ public class Game2D implements Game{
 
     @Override
     public boolean won() {
-        var winScreen = new UIRectangle(new Rect(-100,-100,200,200),
+        UIStyle winStyle = new UIStyle();
+        UIStyle.DEFAULT.font = font.deriveFont(15f);
+        winStyle.font = font.deriveFont(40f);
+        winStyle.backgroundColor = new Color(0,0,0,0.75f);
+        var winScreen = new UIRectangle(new Rect(-120,-55,280,100),
                 new Vertex(0.5,0.5),
-                UIStyle.DEFAULT);
+                winStyle);
         Instantiate(Layers.L_UI,winScreen);
+        var winText = new UILabel("You Win!", new Rect(-100,-25,200,20),
+                new Vertex(0.5,0.5), winStyle);
+        Instantiate(Layers.L_UI,winText);
+        var timeTaken = new UILabel("Your run took: " + GameTime.Time() + "s", new Rect(-100,0,200,20),
+                new Vertex(0.5,0.5), UIStyle.DEFAULT);
+        Instantiate(Layers.L_UI,timeTaken);
+        var restartText = new UILabel("Press STRG and R to restart!", new Rect(-100,25,200,20),
+                new Vertex(0.5,0.5), UIStyle.DEFAULT);
+        Instantiate(Layers.L_UI,restartText);
         return true;
     }
 
@@ -518,16 +528,12 @@ public class Game2D implements Game{
                 width - 200,112);
         g.drawString("Entities: ",
                 0,16);
-       for(int i = 0; i < goss().get(Layers.L_ENTITIES).size(); i++){
+        for(int i = 0; i < goss().get(Layers.L_ENTITIES).size(); i++){
             var o = goss().get(Layers.L_ENTITIES).get(i);
             g.drawString(String.format(o.name() + "|" + String.format("x:%.2f",o.pos().x) +
                     " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 2));
         }
         g.drawString(String.format("Seed: " + seed), 4,height-4);
-        g.setColor(Color.magenta);
-        g.fillRect(width / 2 - 200, 8, 400,16);
-        g.setColor(Color.white);
-        g.drawString("Corrupted Crystal",width / 2 - 75, 40);
     }
 
     @Override

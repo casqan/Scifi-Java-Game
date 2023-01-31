@@ -13,10 +13,10 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public abstract class UIComponent implements GameObj {
-    Rect rect;
-    Vertex anchor;
-    VertexInt asp; // Anchored Screen Position
-    UIStyle style;
+    public Rect rect;
+    public Vertex anchor;
+    public VertexInt asp; // Anchored Screen Position
+    public UIStyle style;
     public UIComponent(Rect rect,Vertex anchor,UIStyle style){
         this.rect = rect;
         this.asp = new VertexInt(0,0);
@@ -78,8 +78,8 @@ public abstract class UIComponent implements GameObj {
     // des Windows vorraus gesagt werden. Die position ist dann der Offset
     // vom Anchor.
     public VertexInt GenerateAnchoredPosition(){
-        int x = (int) (pos().x + anchor().x * (Game2D.getInstance().width() - width()) + width() / 2);
-        int y = (int) (pos().y + anchor().y * (Game2D.getInstance().height() - height()) + height() / 2);
+        int x = (int) (pos().x + anchor().x * (Game2D.getInstance().width() - width()));
+        int y = (int) (pos().y + anchor().y * (Game2D.getInstance().height() - height()));
         return new VertexInt(x,y);
     }
 
