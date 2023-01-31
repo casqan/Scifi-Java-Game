@@ -33,6 +33,7 @@ import static java.awt.event.KeyEvent.*;
 
 public class Game2D implements Game{
     public static HashMap<String,GameObj> PREFABS = new HashMap<>();
+    public static boolean debug = false;
     public Key keyEntity;
     int width;
     int height;
@@ -116,7 +117,8 @@ public class Game2D implements Game{
 
         VertexInt playerSize = new VertexInt(64,64);
         int scale = 4;
-        
+
+        //region Player Animations
         Animation playerIdlepx = new Animation(new SpriteSheet("sprites/player/idlepx.png",
                 playerSize,scale), 12,true);
         Animation playerIdlenx = new Animation(new SpriteSheet("sprites/player/idlenx.png",
@@ -165,7 +167,8 @@ public class Game2D implements Game{
         playerAnimations.put(EntityAction.ATTACKNY,playerattackny);
 
         playerAnimations.put(EntityAction.DEATH,playerDeath);
-
+        //endregion
+        //region Player Setup
         Player _player = new Player(playerAnimations,new Vertex(0,0),
                 new Vertex(112,132),32,16,new Vertex(0,0),1,EntityAction.IDLEPX);
         _player.onDeath.Clear();
@@ -181,19 +184,44 @@ public class Game2D implements Game{
         playerattacknx.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
         playerattackpy.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
         playerattackny.onAnimationEnd.AddListener((anim) -> _player.attacking = false);
+        //endregion
+        //region Player UI
+        var healthStyle = new UIStyle();
+        healthStyle.backgroundColor = Color.green;
+        var healthBar = new UIRectangle(new Rect(16,32,player.health,20),new Vertex(0,0),healthStyle);
+        var healthBarLabel = new UILabel("Health: " + player.health,new Rect(16,20,200,20),new Vertex(0,0),healthStyle);
 
-        //Input Setup
-        InputManager.RegisterOnKeyDown(VK_W,(key) -> player().velocity().add(new Vertex(0,-2)));
-        InputManager.RegisterOnKeyUp(VK_W,(key) -> player().velocity().add(new Vertex(0,2)));
+        player().onDamage.AddListener((player) -> {
+            if (player.health < 10) {
+                healthStyle.backgroundColor = Color.red;
+            } else if (player.health < 30) {
+                healthStyle.backgroundColor = Color.yellow;
+            } else {
+                healthStyle.backgroundColor = Color.green;
+            }
+            healthBar.rect.dimensions.x = (int) (player.health);
+            healthBarLabel.SetContent("Health: " + player.health);
+        });
 
-        InputManager.RegisterOnKeyDown(VK_S,(key) -> player().velocity().add(new Vertex(0,2)));
-        InputManager.RegisterOnKeyUp(VK_S,(key) -> player().velocity().add(new Vertex(0,-2)));
+        var coinsLabel = new UILabel("Coins: " + player.coins,new Rect(16,20,200,20),
+                new Vertex(1,1),healthStyle);
+        var keysLabel = new UILabel("Keys: " + player.keys,new Rect(16,20,200,20),
+                new Vertex(1,1),healthStyle);
+        Instantiate(Layers.L_UI,healthBar);
+        Instantiate(Layers.L_UI,healthBarLabel);
+        //endregion
+        //region Input Setup
+        InputManager.RegisterOnKeyDown(VK_W,(key) -> player().movementInput.add(new Vertex(0,-1)));
+        InputManager.RegisterOnKeyUp(VK_W,(key) -> player().movementInput.add(new Vertex(0,1)));
 
-        InputManager.RegisterOnKeyDown(VK_D,(key) -> player().velocity().add(new Vertex(2,0)));
-        InputManager.RegisterOnKeyUp(VK_D,(key) -> player().velocity().add(new Vertex(-2,0)));
+        InputManager.RegisterOnKeyDown(VK_S,(key) -> player().movementInput.add(new Vertex(0,1)));
+        InputManager.RegisterOnKeyUp(VK_S,(key) -> player().movementInput.add(new Vertex(0,-1)));
 
-        InputManager.RegisterOnKeyDown(VK_A,(key) -> player().velocity().add(new Vertex(-2,0)));
-        InputManager.RegisterOnKeyUp(VK_A,(key) -> player().velocity().add(new Vertex(2,0)));
+        InputManager.RegisterOnKeyDown(VK_D,(key) -> player().movementInput.add(new Vertex(1,0)));
+        InputManager.RegisterOnKeyUp(VK_D,(key) -> player().movementInput.add(new Vertex(-1,0)));
+
+        InputManager.RegisterOnKeyDown(VK_A,(key) -> player().movementInput.add(new Vertex(-1,0)));
+        InputManager.RegisterOnKeyUp(VK_A,(key) -> player().movementInput.add(new Vertex(1,0)));
 
         InputManager.RegisterOnKeyDown(VK_R,(key) -> Gizmos.Clear());
 
@@ -240,8 +268,8 @@ public class Game2D implements Game{
             }
             System.out.println("====================================");
         });
-
-        //Enemy Setup
+        //endregion
+        //region Enemy Setup
         Animation enemyIdlepx = new Animation(new SpriteSheet("sprites/enemy/enemy_idle_px.png",
                 playerSize,scale), 12,true);
         Animation enemyIdlenx = new Animation(new SpriteSheet("sprites/enemy/enemy_idle_nx.png",
@@ -295,6 +323,7 @@ public class Game2D implements Game{
                 new Vertex(112,132),32,16,new Vertex(0,0),1.5f,EntityAction.IDLEPX);
         enemy.maxHealth = 20;
         PREFABS.put("enemy",enemy);
+        //endregion
 
         //!DEBUG
         InputManager.RegisterOnKeyDown(VK_E,(key) -> {
@@ -306,8 +335,8 @@ public class Game2D implements Game{
                 new VertexInt(32,32),4),4,true);
         var merchantAnimations = new HashMap<String,Animation>();
         merchantAnimations.put(EntityAction.IDLEPX,merchantIdle);
-        Entity merchant = new Entity(merchantAnimations,new Vertex(200,0),
-                new Vertex(60,134),50,6,new Vertex(0,0),2,EntityAction.IDLEPX);
+        Entity merchant = new Entity(merchantAnimations,new Vertex(400,400),
+                new Vertex(48,76),32,16,new Vertex(0,0),2,EntityAction.IDLEPX);
         merchant.name = "merchant";
         Instantiate(Layers.L_ENTITIES,merchant);
 
@@ -325,7 +354,7 @@ public class Game2D implements Game{
         dungeonTileset = new Tileset("sprites/tileset/dungeontiles.png",16,16);
 
         try{
-            InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavtt.ttf");
+            InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavalpro/upheavalpro.ttf");
             font = Font.createFont(Font.TRUETYPE_FONT,in).deriveFont(15f);
 
         } catch (Exception e){
@@ -351,7 +380,7 @@ public class Game2D implements Game{
 
     public void GenerateDungeon(){
         Gizmos.Clear();
-        seed = new Random().nextInt();
+        if (seed == Integer.MIN_VALUE) seed = new Random().nextInt();
         Dungeon dungeon = Dungeon.Generate(seed,1,1,1,1,
                 16,16,0,dungeonTileset);
         activeObjects.get(Layers.L_ENVIRONMENT).clear();
@@ -367,7 +396,7 @@ public class Game2D implements Game{
             offset++;
         }
         dungeon.Root().data.BuildRoom();
-        Dungeon.CreateDungeonGizmos(dungeon, 32);
+        if (debug) Dungeon.CreateDungeonGizmos(dungeon, 32);
     }
 
     public void SpawnEnemy(Enemy enemy, Vertex pos){
@@ -451,7 +480,7 @@ public class Game2D implements Game{
         var winText = new UILabel("You Win!", new Rect(-100,-25,200,20),
                 new Vertex(0.5,0.5), winStyle);
         Instantiate(Layers.L_UI,winText);
-        var timeTaken = new UILabel("Your run took: " + GameTime.Time() + "s", new Rect(-100,0,200,20),
+        var timeTaken = new UILabel("Your run took: " + GameTime.Time() + " seconds", new Rect(-100,0,200,20),
                 new Vertex(0.5,0.5), UIStyle.DEFAULT);
         Instantiate(Layers.L_UI,timeTaken);
         var restartText = new UILabel("Press STRG and R to restart!", new Rect(-100,25,200,20),
@@ -462,7 +491,24 @@ public class Game2D implements Game{
 
     @Override
     public boolean lost() {
-        return false;
+        UIStyle lostStyle = new UIStyle();
+        UIStyle.DEFAULT.font = font.deriveFont(15f);
+        lostStyle.font = font.deriveFont(40f);
+        lostStyle.backgroundColor = new Color(0,0,0,0.75f);
+        var winScreen = new UIRectangle(new Rect(-120,-55,280,100),
+                new Vertex(0.5,0.5),
+                lostStyle);
+        Instantiate(Layers.L_UI,winScreen);
+        var winText = new UILabel("You've Lost!", new Rect(-100,-25,200,20),
+                new Vertex(0.5,0.5), lostStyle);
+        Instantiate(Layers.L_UI,winText);
+        var timeTaken = new UILabel("Your survived for: " + GameTime.Time() + " seconds", new Rect(-100,0,200,20),
+                new Vertex(0.5,0.5), UIStyle.DEFAULT);
+        Instantiate(Layers.L_UI,timeTaken);
+        var restartText = new UILabel("Press STRG and R to restart!", new Rect(-100,25,200,20),
+                new Vertex(0.5,0.5), UIStyle.DEFAULT);
+        Instantiate(Layers.L_UI,restartText);
+        return true;
     }
 
     @Override
@@ -511,6 +557,7 @@ public class Game2D implements Game{
     public void PaintUI(Graphics g){
         g.setFont(font);
         for (GameObj obj : activeObjects.get(Layers.L_UI)) obj.paintTo(g);
+        if(!debug) return;
         g.setColor(Color.white);
         g.drawString(String.format("Time: %.2f", GameTime.Time()),
                 width - 200,16);

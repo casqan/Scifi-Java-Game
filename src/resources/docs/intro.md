@@ -78,6 +78,6 @@ Abstand 5 Gegner gespawnt, die Bekämpft werden müssen, während der Kristall i
 aussendet, die dem Spieler schaden zufügt, wenn er zu nah am Kristall ist.
 
 # Assets
-
 - Sprites: https://cainos.itch.io/pixel-art-top-down-basic
 - Player: https://rgsdev.itch.io/animated-top-down-character-base-template-in-pixel-art-rgsdev
+- Font: https://www.dafont.com/de/upheaval-pro.font

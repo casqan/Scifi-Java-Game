@@ -57,6 +57,7 @@ public class Vertex {
 		return Math.sqrt(x*x + y*y);
 	}
 	public Vertex normalized(){
+		if (this.magnitude() == 0) return new Vertex(0,0);
 		return new Vertex(this).mult(1d / this.magnitude());
 	}
 	public void Normalize(){

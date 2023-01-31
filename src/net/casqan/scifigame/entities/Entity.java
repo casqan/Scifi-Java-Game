@@ -131,10 +131,17 @@ public class Entity extends AbstractGameObj implements Cloneable{
         pos().add(velocity.mult(-1));
     }
 
+    public void Interact(){
+        System.out.println("Interacting with entity!");
+    }
+
     @Override
     public void paintTo(Graphics g) {
         screenPos = getScreenPos();
         g.drawImage(CurrentAnim().GetCurrentFrame(), (int)screenPos.x,(int)screenPos.y,null);
+
+        //Debug UI
+        if (!Game2D.debug) return;
         g.setColor(Color.GRAY);
         var anchored = Camera.WorldToScreenPosition(Vertex.add(pos(),anchor()));
         g.drawRect((int)anchored.x ,(int) anchored.y,width,height);

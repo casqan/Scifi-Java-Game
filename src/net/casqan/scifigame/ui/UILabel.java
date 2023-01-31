@@ -12,7 +12,7 @@ public class UILabel extends UIComponent{
         super(rect,anchor,style);
         this.content = content;
     };
-    public void SetContent(String content){ content = this.content; }
+    public void SetContent(String content){ this.content = content; }
     public String Content(){ return content; }
 
     @Override

@@ -11,7 +11,6 @@ import static java.awt.event.KeyEvent.VK_F11;
 
 public interface Game{
 
-
   int width();
   int height();
   void width(int width);

@@ -31,7 +31,7 @@ public abstract class UIComponent implements GameObj {
 
     @Override
     public Vertex velocity() {
-        return null;
+        return Vertex.zero;
     }
 
     @Override

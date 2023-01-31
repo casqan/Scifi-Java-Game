@@ -98,13 +98,17 @@ public class Boss extends Entity {
             g.fillOval((int)damageScreenPos.x,(int)damageScreenPos.y,(int)(attackRange * 2),(int)(attackRange * 2));
         }
         g.drawImage(animations.get(currentAction).GetCurrentFrame(),(int)screenPos.x,(int)screenPos.y,null);
-        g.setColor(Color.WHITE);
-        g.drawString("" + health,(int)screenPos.x,(int)screenPos.y);
-        g.setColor(Color.gray);
-        g.drawRect((int)gizmoPos.x,(int)gizmoPos.y,width,height);
-        g.drawString("Guardians: " + enemyCount,0 ,64);
-        g.drawString("nextSpawnTime: " + nextSpawnTime,0 ,64 + 16);
-        g.drawString("nextDamageTime: " + nextDamageTime,0 ,64 + 32);
-        g.drawString("damagePos " + damagePos,0 ,64 + 48);
+
+        //Developer UI
+        if (Game2D.debug){
+            g.setColor(Color.WHITE);
+            g.drawString("" + health,(int)screenPos.x,(int)screenPos.y);
+            g.setColor(Color.gray);
+            g.drawRect((int)gizmoPos.x,(int)gizmoPos.y,width,height);
+            g.drawString("Guardians: " + enemyCount,0 ,64);
+            g.drawString("nextSpawnTime: " + nextSpawnTime,0 ,64 + 16);
+            g.drawString("nextDamageTime: " + nextDamageTime,0 ,64 + 32);
+            g.drawString("damagePos " + damagePos,0 ,64 + 48);
+        }
     }
 }
