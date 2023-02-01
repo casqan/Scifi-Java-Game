@@ -5,14 +5,29 @@ import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
 
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
 
 public class UILabel extends UIComponent{
     String content;
     public UILabel(String content, Rect rect, Vertex anchor, UIStyle style){
         super(rect,anchor,style);
         this.content = content;
+        CalculateSize();
     };
-    public void SetContent(String content){ this.content = content; }
+    public void SetContent(String content){
+        this.content = content;
+        CalculateSize();
+    }
+    void CalculateSize(){
+        if (style.font == null) style.font = UIStyle.DEFAULT.font;
+        var context = new FontRenderContext(style.font.getTransform(),true,true);
+        TextLayout layout = new TextLayout(Content(), style.font, context);
+        var bounds = layout.getBounds();
+        rect.dimensions.x = (int) bounds.getWidth();
+        rect.dimensions.y = (int) bounds.getHeight();
+    }
     public String Content(){ return content; }
 
     @Override

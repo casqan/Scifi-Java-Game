@@ -31,7 +31,7 @@ public class Key extends Entity {
     @Override
     public void onCollision(GameObj that) {
         if (that instanceof Player player){
-            player.keys++;
+            player.AddKeys(1);
             Game2D.getInstance().Destroy(this, Layers.L_ENTITIES);
         }
     }

@@ -204,7 +204,7 @@ public class Room {
                 bossHealthContainerStyle.backgroundColor = Color.black;
                 var healthContainer = new UIRectangle(new Rect(0,6,208,28),new Vertex(0.5,0),bossHealthContainerStyle);
                 var healthBar = new UIRectangle(new Rect(0,10,200,20),new Vertex(0.5,0),bossUIStyle);
-                var healthBarText = new UILabel("Corrupted Crystal",new Rect(-75,50,0,0),new Vertex(0.5,0),bossUIStyle);
+                var healthBarText = new UILabel("Corrupted Crystal",new Rect(0,50,0,0),new Vertex(0.5,0),bossUIStyle);
                 Instantiate(Layers.L_UI,healthContainer);
                 Instantiate(Layers.L_UI,healthBar);
                 Instantiate(Layers.L_UI,healthBarText);

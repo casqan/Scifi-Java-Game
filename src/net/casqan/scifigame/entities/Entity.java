@@ -25,6 +25,7 @@ public class Entity extends AbstractGameObj implements Cloneable{
     public int health;
     public float speed;
     public Vertex screenPos;
+    boolean dead = false;
 
     public Event<Entity> onDamage = new Event<>();
     public Event<Entity> onDeath = new Event<>();
@@ -112,11 +113,14 @@ public class Entity extends AbstractGameObj implements Cloneable{
 
     public void DealDamage(int damage){
         System.out.println("Dealing damage to entity!");
+        if (dead) return;
         health -= damage;
+        if (health < 0) health = 0;
         onDamage.Invoke(this);
         if (health <= 0){
             onDeath.Invoke(this);
             Die();
+            dead = true;
         }
     }
     public void Die(){

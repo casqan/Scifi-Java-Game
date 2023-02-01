@@ -33,7 +33,7 @@ public class Door extends Wall {
         var player = Game2D.getInstance().player();
         if (player.Keys() < 1) return;
         node.data.BuildRoom();
-        Game2D.getInstance().player().keys -= 1;
+        Game2D.getInstance().player().AddKeys(-1);
         Game2D.getInstance().Destroy(this, Layers.L_STATICS);
     }
 }

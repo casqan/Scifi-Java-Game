@@ -23,6 +23,9 @@ import net.casqan.scifigame.ui.UIStyle;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.sql.SQLType;
 import java.util.*;
@@ -109,6 +112,14 @@ public class Game2D implements Game{
     @Override
     public void init() {
         GameTime.Init();
+        try{
+            InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavalpro/upheavalpro.ttf");
+            font = Font.createFont(Font.TRUETYPE_FONT,in).deriveFont(15f);
+        } catch (Exception e){
+            System.out.println("Could not load font, reverting to default.");
+            System.out.println(e);
+        }
+        UIStyle.DEFAULT.font = font;
         instance = this;
         activeObjects.put(Layers.L_ENTITIES,new ArrayList<>());
         activeObjects.put(Layers.L_STATICS,new ArrayList<>());
@@ -203,12 +214,22 @@ public class Game2D implements Game{
             healthBarLabel.SetContent("Health: " + player.health);
         });
 
-        var coinsLabel = new UILabel("Coins: " + player.coins,new Rect(16,20,200,20),
-                new Vertex(1,1),healthStyle);
-        var keysLabel = new UILabel("Keys: " + player.keys,new Rect(16,20,200,20),
-                new Vertex(1,1),healthStyle);
+        var coinsLabel = new UILabel(player.coins + " Coins",new Rect(-16,16,200,20),
+                new Vertex(1,0),healthStyle);
+        var keysLabel = new UILabel( player.keys + " Keys",new Rect(-16,32,200,20),
+                new Vertex(1,0),healthStyle);
+
+        player().onCoinPickup.AddListener((player) -> {
+            coinsLabel.SetContent(player.coins + " Coins");
+        });
+        player().onKeyPickup.AddListener((player) -> {
+            keysLabel.SetContent(player.keys + " Keys");
+        });
+
         Instantiate(Layers.L_UI,healthBar);
         Instantiate(Layers.L_UI,healthBarLabel);
+        Instantiate(Layers.L_UI,keysLabel);
+        Instantiate(Layers.L_UI,coinsLabel);
         //endregion
         //region Input Setup
         InputManager.RegisterOnKeyDown(VK_W,(key) -> player().movementInput.add(new Vertex(0,-1)));
@@ -335,7 +356,7 @@ public class Game2D implements Game{
                 new VertexInt(32,32),4),4,true);
         var merchantAnimations = new HashMap<String,Animation>();
         merchantAnimations.put(EntityAction.IDLEPX,merchantIdle);
-        Entity merchant = new Entity(merchantAnimations,new Vertex(400,400),
+        Merchant merchant = new Merchant(merchantAnimations,new Vertex(400,400),
                 new Vertex(48,76),32,16,new Vertex(0,0),2,EntityAction.IDLEPX);
         merchant.name = "merchant";
         Instantiate(Layers.L_ENTITIES,merchant);
@@ -352,15 +373,6 @@ public class Game2D implements Game{
 
         //Build Map
         dungeonTileset = new Tileset("sprites/tileset/dungeontiles.png",16,16);
-
-        try{
-            InputStream in = getClass().getClassLoader().getResourceAsStream("resources/fonts/upheavalpro/upheavalpro.ttf");
-            font = Font.createFont(Font.TRUETYPE_FONT,in).deriveFont(15f);
-
-        } catch (Exception e){
-            System.out.println("Could not load font, reverting to default.");
-            System.out.println(e);
-        }
 
         GenerateDungeon();
         InputManager.RegisterOnKeyDown(VK_T, var -> GenerateDungeon());
@@ -471,19 +483,19 @@ public class Game2D implements Game{
     public boolean won() {
         UIStyle winStyle = new UIStyle();
         UIStyle.DEFAULT.font = font.deriveFont(15f);
-        winStyle.font = font.deriveFont(40f);
+        winStyle.font = font.deriveFont(55f);
         winStyle.backgroundColor = new Color(0,0,0,0.75f);
-        var winScreen = new UIRectangle(new Rect(-120,-55,280,100),
+        var winScreen = new UIRectangle(new Rect(0,0,300,150),
                 new Vertex(0.5,0.5),
                 winStyle);
         Instantiate(Layers.L_UI,winScreen);
-        var winText = new UILabel("You Win!", new Rect(-100,-25,200,20),
+        var winText = new UILabel("You Win!", new Rect(0,0,200,20),
                 new Vertex(0.5,0.5), winStyle);
         Instantiate(Layers.L_UI,winText);
-        var timeTaken = new UILabel("Your run took: " + GameTime.Time() + " seconds", new Rect(-100,0,200,20),
+        var timeTaken = new UILabel("Your run took: " + GameTime.Time() + " seconds", new Rect(0,50,200,20),
                 new Vertex(0.5,0.5), UIStyle.DEFAULT);
         Instantiate(Layers.L_UI,timeTaken);
-        var restartText = new UILabel("Press STRG and R to restart!", new Rect(-100,25,200,20),
+        var restartText = new UILabel("Press STRG and R to restart!", new Rect(0,-50,200,20),
                 new Vertex(0.5,0.5), UIStyle.DEFAULT);
         Instantiate(Layers.L_UI,restartText);
         return true;
@@ -491,21 +503,21 @@ public class Game2D implements Game{
 
     @Override
     public boolean lost() {
-        UIStyle lostStyle = new UIStyle();
+        UIStyle winStyle = new UIStyle();
         UIStyle.DEFAULT.font = font.deriveFont(15f);
-        lostStyle.font = font.deriveFont(40f);
-        lostStyle.backgroundColor = new Color(0,0,0,0.75f);
-        var winScreen = new UIRectangle(new Rect(-120,-55,280,100),
+        winStyle.font = font.deriveFont(55f);
+        winStyle.backgroundColor = new Color(0,0,0,0.75f);
+        var winScreen = new UIRectangle(new Rect(0,0,300,150),
                 new Vertex(0.5,0.5),
-                lostStyle);
+                winStyle);
         Instantiate(Layers.L_UI,winScreen);
-        var winText = new UILabel("You've Lost!", new Rect(-100,-25,200,20),
-                new Vertex(0.5,0.5), lostStyle);
+        var winText = new UILabel("You Lost!", new Rect(0,0,200,20),
+                new Vertex(0.5,0.5), winStyle);
         Instantiate(Layers.L_UI,winText);
-        var timeTaken = new UILabel("Your survived for: " + GameTime.Time() + " seconds", new Rect(-100,0,200,20),
+        var timeTaken = new UILabel("Your run took: " + GameTime.Time() + " seconds", new Rect(0,50,200,20),
                 new Vertex(0.5,0.5), UIStyle.DEFAULT);
         Instantiate(Layers.L_UI,timeTaken);
-        var restartText = new UILabel("Press STRG and R to restart!", new Rect(-100,25,200,20),
+        var restartText = new UILabel("Press STRG and R to restart!", new Rect(0,-50,200,20),
                 new Vertex(0.5,0.5), UIStyle.DEFAULT);
         Instantiate(Layers.L_UI,restartText);
         return true;
@@ -557,6 +569,8 @@ public class Game2D implements Game{
     public void PaintUI(Graphics g){
         g.setFont(font);
         for (GameObj obj : activeObjects.get(Layers.L_UI)) obj.paintTo(g);
+
+        //region Debug
         if(!debug) return;
         g.setColor(Color.white);
         g.drawString(String.format("Time: %.2f", GameTime.Time()),
@@ -581,6 +595,7 @@ public class Game2D implements Game{
                     " " + String.format("y:%.2f",o.pos().x) ), 20,16 * (i + 2));
         }
         g.drawString(String.format("Seed: " + seed), 4,height-4);
+        //endregion
     }
 
     @Override
