@@ -64,7 +64,10 @@ public class Dungeon extends Graph<Room> {
         //Find a room that has no exit Make it an End room
         for (var n : dungeon.nodes){
             if (n.children.size() < 1) {
-                if (dungeon.bossRoom == null) n.data.type = RoomType.Boss;
+                if (dungeon.bossRoom == null) {
+                    n.data.type = RoomType.Boss;
+                    dungeon.bossRoom = n.data;
+                }
                 else n.data.type = RoomType.End;
             }
         }

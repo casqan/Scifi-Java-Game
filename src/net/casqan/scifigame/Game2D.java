@@ -12,6 +12,7 @@ import net.casqan.scifigame.extensions.Physics;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.dungeon.Dungeon;
+import net.casqan.scifigame.gizmos.Gizmo;
 import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
 import net.casqan.scifigame.sprite.*;
@@ -186,6 +187,8 @@ public class Game2D implements Game{
         _player.name = "player";
         _player.health = 200;
         _player.keys = 0;
+        _player.statistics.put(Statistics.SPEED,2d);
+        _player.statistics.put(Statistics.DAMAGE,10d);
         SetPlayer(_player);
 
         camera = new Camera();
@@ -201,6 +204,24 @@ public class Game2D implements Game{
         healthStyle.backgroundColor = Color.green;
         var healthBar = new UIRectangle(new Rect(16,32,player.health,20),new Vertex(0,0),healthStyle);
         var healthBarLabel = new UILabel("Health: " + player.health,new Rect(16,20,200,20),new Vertex(0,0),healthStyle);
+
+        HashMap<String, UILabel> labels = new HashMap<>();
+        labels.put(Statistics.HEALTH,healthBarLabel);
+
+        var armorStatistic = new UILabel("ARMOR: " + player.statistics.getOrDefault(Statistics.ARMOR,0D),
+                new Rect(16,-24,200,20),new Vertex(0,1),healthStyle);
+        var speedStatistic = new UILabel("SPEED: " + player.statistics.getOrDefault(Statistics.SPEED,0D),
+                new Rect(16,-8,200,20),new Vertex(0,1),healthStyle);
+        var damageStatistic = new UILabel("DAMAGE: " + player.statistics.getOrDefault(Statistics.DAMAGE,0D),
+                new Rect(16,-40,200,20),new Vertex(0,1),healthStyle);
+
+        labels.put(Statistics.ARMOR, armorStatistic);
+        labels.put(Statistics.SPEED, speedStatistic);
+        labels.put(Statistics.DAMAGE, damageStatistic);
+
+        player().onStatChange.AddListener((statistic) -> {
+            labels.get(statistic.first).SetContent(statistic + ": " + statistic.second);
+        });
 
         player().onDamage.AddListener((player) -> {
             if (player.health < 10) {
@@ -230,6 +251,9 @@ public class Game2D implements Game{
         Instantiate(Layers.L_UI,healthBarLabel);
         Instantiate(Layers.L_UI,keysLabel);
         Instantiate(Layers.L_UI,coinsLabel);
+        Instantiate(Layers.L_UI,armorStatistic);
+        Instantiate(Layers.L_UI,speedStatistic);
+        Instantiate(Layers.L_UI,damageStatistic);
         //endregion
         //region Input Setup
         InputManager.RegisterOnKeyDown(VK_W,(key) -> player().movementInput.add(new Vertex(0,-1)));
@@ -255,7 +279,7 @@ public class Game2D implements Game{
             System.out.println("Attacking!");
             Vertex size = new Vertex(64,64);
             Vertex pos = Vertex.add(player.pos(),player.anchor());
-
+            //Gizmos.Add(new Gizmo(new Rect(pos,size),Color.red,false));
             //There is absolutely a cleaner Mathematical way to do this,
             // but I'm not going to bother implementing it, because this just works
             if (player.forward().y > 0){
@@ -279,7 +303,8 @@ public class Game2D implements Game{
             var r = new Rect(pos,size);
             //Gizmos.Add(new Gizmo(r,Color.red));
             var col = Physics.OverlapRect(r,damageLayers);
-            var damage = (int) Math.round(player().statistics.getOrDefault(Statistics.DAMAGE,10d));
+            var damage = (int) Math.round(player().statistics.getOrDefault(Statistics.DAMAGE,
+                    player.statistics.getOrDefault(Statistics.DAMAGE,10D)));
             for (var go : col){
                 System.out.println("Overlap with: " + go.name());
                 if (go == player) continue;
@@ -393,7 +418,7 @@ public class Game2D implements Game{
     public void GenerateDungeon(){
         Gizmos.Clear();
         if (seed == Integer.MIN_VALUE) seed = new Random().nextInt();
-        Dungeon dungeon = Dungeon.Generate(seed,1,1,1,1,
+        Dungeon dungeon = Dungeon.Generate(seed,5,3,10,7,
                 16,16,0,dungeonTileset);
         activeObjects.get(Layers.L_ENVIRONMENT).clear();
         activeObjects.get(Layers.L_STATICS).clear();
@@ -492,7 +517,7 @@ public class Game2D implements Game{
         var winText = new UILabel("You Win!", new Rect(0,0,200,20),
                 new Vertex(0.5,0.5), winStyle);
         Instantiate(Layers.L_UI,winText);
-        var timeTaken = new UILabel("Your run took: " + GameTime.Time() + " seconds", new Rect(0,50,200,20),
+        var timeTaken = new UILabel(String.format("Your run took: %s0.3 seconds",GameTime.Time()), new Rect(0,50,200,20),
                 new Vertex(0.5,0.5), UIStyle.DEFAULT);
         Instantiate(Layers.L_UI,timeTaken);
         var restartText = new UILabel("Press STRG and R to restart!", new Rect(0,-50,200,20),

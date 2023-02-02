@@ -8,6 +8,7 @@ import net.casqan.scifigame.core.*;
 import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.animations.Animation;
 import net.casqan.scifigame.animations.EntityAction;
+import net.casqan.scifigame.extensions.Pair;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class Entity extends AbstractGameObj implements Cloneable{
 
     public Event<Entity> onDamage = new Event<>();
     public Event<Entity> onDeath = new Event<>();
+    public Event<Pair<String,Double>> onStatChange = new Event<>();
 
     public HashMap<String, Animation> animations;
     String currentAction = EntityAction.IDLEPX;
@@ -138,7 +140,10 @@ public class Entity extends AbstractGameObj implements Cloneable{
     public void Interact(){
         System.out.println("Interacting with entity!");
     }
-
+    public void UpdateStatistic(String statistic, double value){
+        statistics.put(statistic, value);
+        onStatChange.Invoke(new Pair<>(statistic, value));
+    }
     @Override
     public void paintTo(Graphics g) {
         screenPos = getScreenPos();
