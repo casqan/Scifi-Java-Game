@@ -1,5 +1,12 @@
 # Dokumentation zum Projekt 
 
+## Einleitung
+
+Bei dem Spiel handelt es sich um ein sogenanntes "Rogue-Like", basierend auf dem Spiel "Rogue" von 1980.
+Das Spiel ist ein Dungeon-Crawler, bei dem der Spieler durch einen Dungeon navigieren muss, 
+um den Boss zu finden und zu besiegen. Der Spieler bekommt coins, die er in einem Shop gegen Items eintauschen kann
+um seine eigenen Statistiken, wie z.B. Geschwindigkeit, Schaden, Leben, etc. zu verbessern.
+
 ## Game2D
 
 ## Core
@@ -33,8 +40,12 @@ von `Node<T>` Nachbarn. Die Klasse stellt Methoden zur Verfügung,
 um die Nachbarn zu verändern und zu erhalten.
 
 ## Extensions
+### `Class Pair<T,U>`
+Bei der Klasse Pair handelt es sich um eine generische Klasse, die zwei Objekte vom Typ T und U speichert.
 
-## ResourceLoader
+### `Class Physics`
+Die Klasse Physics stellt Methoden zur Verfügung, um die Kollisionen zwischen Objekten zu berechnen.
+Die Methoden sind statisch und können daher direkt aufgerufen werden.
 
 ## Dungeon
 ### `Class Dungeon`
@@ -47,7 +58,8 @@ diesem Youtube Video:
 https://www.youtube.com/watch?v=qAf9axsyijY
 
 Die Generation wurde jedoch um einige Features erweitert, so sind die Räume 
-dynamisch, entities die darin gespawnt werden.
+dynamisch, d.h. sie sind nicht vorher gespeichert, sondern werden bei der Runtime,
+sobald sie benötigt werden generiert.
 ### Algorithmus
 Der Algorithmus ist wie folgt aufgebaut:
 1. Erstelle einen leeren Graphen

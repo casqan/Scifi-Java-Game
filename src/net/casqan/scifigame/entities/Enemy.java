@@ -23,8 +23,7 @@ public class Enemy extends Character{
         super(og.animations, pos, og.anchor, og.width, og.height, og.velocity, og.speed, og.currentAction);
         this.maxHealth = og.maxHealth;
         this.health = og.maxHealth;
-        this.onDeath = new Event<>();
-        this.onDeath.AddListener((e) -> Game2D.getInstance().Destroy(e, Layers.L_ENTITIES));
+        this.onDeath = og.onDeath;
         this.damage = og.damage;
     }
     @Override
@@ -37,6 +36,7 @@ public class Enemy extends Character{
 
     @Override
     public void move() {
+        if (dead) return;
         var player = Game2D.getInstance().player();
         var v = Vertex.sub(Vertex.add(player.pos(),player.anchor()),Vertex.add(pos(),anchor()));
         v = v.mult(1d / v.magnitude());
@@ -46,7 +46,6 @@ public class Enemy extends Character{
 
     @Override
     public void Die() {
-        Game2D.getInstance().Destroy(this, Layers.L_ENTITIES);
         super.Die();
     }
 

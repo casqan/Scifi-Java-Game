@@ -86,7 +86,7 @@ public class Entity extends AbstractGameObj implements Cloneable{
 
     @Override
     public void move() {
-        super.move();
+        if (!dead) super.move();
     }
 
     @Override
@@ -116,19 +116,26 @@ public class Entity extends AbstractGameObj implements Cloneable{
     public void DealDamage(int damage){
         System.out.println("Dealing damage to entity!");
         if (dead) return;
-        health -= damage;
+        health -= CalculateDamage(damage);
         if (health < 0) health = 0;
         onDamage.Invoke(this);
         if (health <= 0){
             onDeath.Invoke(this);
             Die();
-            dead = true;
         }
     }
+
+    //Damage formula: damage * e^(-0.1 * armor)
+    int CalculateDamage(int damage){
+        if (statistics.getOrDefault(Statistics.ARMOR,0D)== 0) return damage;
+        return (int) (damage * Math.pow(Math.E,-0.1d * statistics.get(Statistics.ARMOR)));
+    }
+
     public void Die(){
+        dead = true;
         SetCurrentAction(EntityAction.DEATH);
         animations.get(EntityAction.DEATH).onAnimationEnd.AddListener(
-                (var) -> Game2D.getInstance().goss().get(Layers.L_ENTITIES).remove(this));
+                (var) -> Game2D.getInstance().Destroy(this, Layers.L_ENTITIES));
     }
 
     @Override
