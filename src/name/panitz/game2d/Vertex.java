@@ -6,6 +6,12 @@ public class Vertex {
 	public double x;
 	public double y;
 	public static final Vertex zero = new Vertex(0,0);
+	public static final Vertex one = new Vertex(1,1);
+	public static final Vertex up = new Vertex(0,-1);
+	public static final Vertex down = new Vertex(0,1);
+	public static final Vertex left = new Vertex(-1,0);
+	public static final Vertex right = new Vertex(1,0);
+	public static final Vertex half = new Vertex(0.5,0.5);
 
 	public Vertex(double x, double y) {
 		this.x = x;

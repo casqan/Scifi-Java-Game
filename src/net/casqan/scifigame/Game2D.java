@@ -371,9 +371,20 @@ public class Game2D implements Game{
         PREFABS.put("enemy",enemy);
         //endregion
 
-        //!DEBUG
-        InputManager.RegisterOnKeyDown(VK_E,(key) -> {
+
+        InputManager.RegisterOnKeyDown(VK_TAB,(key) -> {
             SpawnEnemy(enemy,new Vertex(random.nextInt(500),random.nextInt(500)));
+        });
+
+        InputManager.RegisterOnKeyDown(VK_E,(key) -> {
+             for (var go : goss().get(Layers.L_ENTITIES)){
+                 if (Vertex.sub(Vertex.add(go.anchor(),go.pos()),
+                         Vertex.add(player().pos(),player().anchor())).magnitude() < 100 )
+                 if (go instanceof Entity && !go.equals(player())){
+                     ((Entity) go).Interact();
+                     return;
+                 }
+             }
         });
 
         //Setup Merchant
