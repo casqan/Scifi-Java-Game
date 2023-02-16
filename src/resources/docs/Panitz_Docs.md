@@ -4,8 +4,30 @@
 
 Bei dem Spiel handelt es sich um ein sogenanntes "Rogue-Like", basierend auf dem Spiel "Rogue" von 1980.
 Das Spiel ist ein Dungeon-Crawler, bei dem der Spieler durch einen Dungeon navigieren muss, 
-um den Boss zu finden und zu besiegen. Der Spieler bekommt coins, die er in einem Shop gegen Items eintauschen kann
-um seine eigenen Statistiken, wie z.B. Geschwindigkeit, Schaden, Leben, etc. zu verbessern.
+u m denBoss zu finden und zu besiegen. ~~Der Spieler bekommt coins, die er in einem Shop gegen Items eintauschen kann
+um seine eigenen Statistiken, wie z.B. Geschwindigkeit, Schaden, Leben, etc. zu verbessern.~~ (Das Kaufen von Upgrades
+wurde vorerst entfernt.)
+## Steuerung
+
+Bewegung mit den Tasten: `W A S D`
+
+Angreifen mit: `Leertaste`
+
+~~Interagiern mit dem Händler: `E`~~
+
+## Features
+Das Spielt besitzt eine sich zufällig generierende Spielwelt, Charactere mit dynamischer Animation (Anpassung an die
+Bewegungsrichtung), vollständig dynamisches UI, welches sich an den Bildschirm anpasst und ein Event-System. In
+Erweiterung zur basis Library.
+
+# Quellen
+- Sprites: https://cainos.itch.io/pixel-art-top-down-basic
+- Player: https://rgsdev.itch.io/animated-top-down-character-base-template-in-pixel-art-rgsdev
+- Font: https://www.dafont.com/de/upheaval-pro.font
+
+# Code Dokumentation
+Im nachgang befindet sich eine (mehr oder weniger vollständige) Dokumentation zum Code. Diese ist hauptsächlich
+nur zum Nachschlagen bei der Entwicklung. Im anhang sind die Quellen zu finden.
 
 ## Game2D
 
@@ -87,9 +109,4 @@ Raum-Typen:
 ### `Boss`
 Der Boss ist ein Statisches Entity in Form eines Kristalls, vom Kristall aus werden in einem bestimmten
 Abstand 5 Gegner gespawnt, die Bekämpft werden müssen, während der Kristall immer wider eine Schock-welle
-aussendet, die dem Spieler schaden zufügt, wenn er zu nah am Kristall ist.
-
-# Assets
-- Sprites: https://cainos.itch.io/pixel-art-top-down-basic
-- Player: https://rgsdev.itch.io/animated-top-down-character-base-template-in-pixel-art-rgsdev
-- Font: https://www.dafont.com/de/upheaval-pro.font
+aussendet, die dem Spieler Schaden zufügt, wenn er zu nah am Kristall ist.

@@ -23,7 +23,10 @@ public class Enemy extends Character{
         super(og.animations, pos, og.anchor, og.width, og.height, og.velocity, og.speed, og.currentAction);
         this.maxHealth = og.maxHealth;
         this.health = og.maxHealth;
-        this.onDeath = og.onDeath;
+        this.onDeath = new Event<>();
+        onDeath.AddListener(entity -> Die());
+        onDeath.AddListener(entity -> Game2D.getInstance().player()
+                .AddCoins(Game2D.Random().nextInt(5) + 5));
         this.damage = og.damage;
     }
     @Override
