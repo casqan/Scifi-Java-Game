@@ -17,6 +17,15 @@ public final class InputManager {
         if (!keys.containsKey(key)) keys.put(key, new KeyAction(key));
         keys.get(key).getOnKeyUp().AddListener(listener);
     }
+    public static void UnregisterOnKeyDown(int key, Consumer<Integer> listener){
+        if (!keys.containsKey(key)) return;
+        keys.get(key).getOnKeyDown().RemoveListener(listener);
+    }
+
+    public static void UnregisterOnKeyUp(int key, Consumer<Integer> listener){
+        if (!keys.containsKey(key)) return;
+        keys.get(key).getOnKeyUp().RemoveListener(listener);
+    }
 
     public static void SetPressed(int key,boolean pressed){
         if (!keys.containsKey(key)) return;
