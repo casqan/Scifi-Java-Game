@@ -9,6 +9,7 @@ import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.animations.Animation;
 import net.casqan.scifigame.animations.EntityAction;
 import net.casqan.scifigame.extensions.Pair;
+import net.casqan.scifigame.items.Item;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -151,6 +152,13 @@ public class Entity extends AbstractGameObj implements Cloneable{
         statistics.put(statistic, value);
         onStatChange.Invoke(new Pair<>(statistic, value));
     }
+
+    public void ConsumeItem(Item item){
+        for (var stat : item.statistics.keySet()){
+           UpdateStatistic(stat,statistics.getOrDefault(stat,0D) + item.statistics.get(stat));
+        }
+    }
+
     @Override
     public void paintTo(Graphics g) {
         screenPos = getScreenPos();
