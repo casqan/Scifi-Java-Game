@@ -195,6 +195,7 @@ public class Game2D implements Game{
         _player.name = "player";
         _player.health = 200;
         _player.keys = 0;
+        _player.coins = 200000;
         _player.statistics.put(Statistics.SPEED,2d);
         _player.statistics.put(Statistics.DAMAGE,10d);
         SetPlayer(_player);
@@ -228,7 +229,7 @@ public class Game2D implements Game{
         labels.put(Statistics.DAMAGE, damageStatistic);
 
         player().onStatChange.AddListener((statistic) -> {
-            labels.get(statistic.first).SetContent(statistic + ": " + statistic.second);
+            labels.get(statistic.first).SetContent(statistic.first + ": " + statistic.second);
         });
 
         player().onDamage.AddListener((player) -> {
@@ -422,6 +423,9 @@ public class Game2D implements Game{
         items.put(wingedSword.name, wingedSword);
         items.put(berries.name, berries);
         items.put(brestplate.name, brestplate);
+
+        merchant.SetItems(items.values());
+
         //Spawn Enemies
         var list = new ArrayList<GameObj>();
         Instantiate(Layers.L_ENTITIES,player);

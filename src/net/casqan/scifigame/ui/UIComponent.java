@@ -53,6 +53,9 @@ public abstract class UIComponent implements GameObj {
     public String name() {
         return "";
     }
+    public void Show(){
+
+    }
 
     @Override
     public void Update() {
