@@ -24,6 +24,7 @@ Erweiterung zur basis Library.
 - Sprites: https://cainos.itch.io/pixel-art-top-down-basic
 - Player: https://rgsdev.itch.io/animated-top-down-character-base-template-in-pixel-art-rgsdev
 - Font: https://www.dafont.com/de/upheaval-pro.font
+- Item sprites: https://game-icons.net/
 
 # Code Dokumentation
 Im nachgang befindet sich eine (mehr oder weniger vollständige) Dokumentation zum Code. Diese ist hauptsächlich

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<item>
+    <id></id>
+    <icon></icon>
+    <statistics>
+        <health>10</health>
+        <armor>10</armor>
+        <health>30</health>
+        <price>100</price>
+    </statistics>
+</item>

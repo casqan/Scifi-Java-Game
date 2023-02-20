@@ -15,6 +15,7 @@ import net.casqan.scifigame.dungeon.Dungeon;
 import net.casqan.scifigame.gizmos.Gizmo;
 import net.casqan.scifigame.gizmos.Gizmos;
 import net.casqan.scifigame.input.InputManager;
+import net.casqan.scifigame.items.Item;
 import net.casqan.scifigame.sprite.*;
 import net.casqan.scifigame.tilesystem.Tileset;
 import net.casqan.scifigame.ui.UIComponent;
@@ -39,6 +40,7 @@ public class Game2D implements Game{
     public static HashMap<String,GameObj> PREFABS = new HashMap<>();
     public static boolean debug = false;
     public Key keyEntity;
+    boolean ended = false;
     int width;
     int height;
     Player player;
@@ -57,6 +59,7 @@ public class Game2D implements Game{
     public int seed;
 
     HashMap<String,List<GameObj>> activeObjects;
+    public HashMap<String, Item> items = new HashMap<>();
     Set<String> damageLayers;
     private static Random random;
     public static Random Random() {return random;}
@@ -129,6 +132,11 @@ public class Game2D implements Game{
 
         VertexInt playerSize = new VertexInt(64,64);
         int scale = 4;
+
+
+        //Yes, I am aware this is absolutely disgusting, but I don't want to use a library to load
+        //in prefabs. As that would take even longer to write than this. It would be better, if this game
+        //was going to get content updates, but it ain't so I'll leave it like this.
 
         //region Player Animations
         Animation playerIdlepx = new Animation(new SpriteSheet("sprites/player/idlepx.png",
@@ -387,7 +395,7 @@ public class Game2D implements Game{
              }
         });
 
-        //Setup Merchant
+        //region Merchant Setup
         Animation merchantIdle = new Animation(new SpriteSheet("sprites/merchant/merchant_idle.png",
                 new VertexInt(32,32),4),4,true);
         var merchantAnimations = new HashMap<String,Animation>();
@@ -396,7 +404,24 @@ public class Game2D implements Game{
                 new Vertex(48,76),32,16,new Vertex(0,0),2,EntityAction.IDLEPX);
         merchant.name = "merchant";
         Instantiate(Layers.L_ENTITIES,merchant);
+        //endregion
 
+        Statistics wingedSwordStats = new Statistics();
+        wingedSwordStats.put(Statistics.DAMAGE,10D);
+        Item wingedSword = new Item("sprites/ui/items/winged-sword.png","Lightweight Sword",
+                "Makes your sword lighter, increases Attack-Speed",50,wingedSwordStats);
+        Statistics berryStatistics = new Statistics();
+        berryStatistics.put(Statistics.HEALTH,50D);
+        Item berries = new Item("sprites/ui/items/berries-bowl.png","Berries",
+                "Some natural berries, great for healing!",50,berryStatistics);
+        Statistics brestplateStatistics = new Statistics();
+        brestplateStatistics.put(Statistics.ARMOR,5D);
+        Item brestplate = new Item("sprites/ui/items/breastplate.png","Breastplate",
+                "Some Chest armor, to increase your resistance to Damage",50,brestplateStatistics);
+
+        items.put(wingedSword.name, wingedSword);
+        items.put(berries.name, berries);
+        items.put(brestplate.name, brestplate);
         //Spawn Enemies
         var list = new ArrayList<GameObj>();
         Instantiate(Layers.L_ENTITIES,player);
@@ -517,6 +542,8 @@ public class Game2D implements Game{
 
     @Override
     public boolean won() {
+        if (ended) return true;
+        ended = true;
         UIStyle winStyle = new UIStyle();
         UIStyle.DEFAULT.font = font.deriveFont(15f);
         winStyle.font = font.deriveFont(55f);
@@ -539,6 +566,8 @@ public class Game2D implements Game{
 
     @Override
     public boolean lost() {
+        if (ended) return true;
+        ended = true;
         UIStyle winStyle = new UIStyle();
         UIStyle.DEFAULT.font = font.deriveFont(15f);
         winStyle.font = font.deriveFont(55f);

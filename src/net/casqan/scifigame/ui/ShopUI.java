@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.awt.event.KeyEvent.VK_ESCAPE;
+import static java.awt.event.KeyEvent.*;
 
 public class ShopUI extends UIComponent{
     List<Item> items = new ArrayList<>();
@@ -29,7 +29,7 @@ public class ShopUI extends UIComponent{
     public void Show(){
         var background = new UIRectangle(new Rect(0,0,width(),height()), Vertex.half, style);
         children.add(background);
-        for (int i = -items.size() / 2; i < items.size() / 2; i++) {
+        for (int i = 0; i < 3; i++) {
             var w = width() / 2 - 20;
             var itemUI = new ItemUI(items.get(i), new Rect( i * 50 + w ,0,0,0), Vertex.half, style);
             children.add(itemUI);
@@ -45,13 +45,21 @@ public class ShopUI extends UIComponent{
         }
         isOpen = true;
         InputManager.RegisterOnKeyDown(VK_ESCAPE, (key) -> this.Close());
+        for (int i = 0; i < items.size(); i++){
+            int finalI = i;
+            InputManager.RegisterOnKeyDown(VK_1 + i,(key) -> this.BuyItem(finalI));
+        }
     }
     public void Close(){
         isOpen = false;
         for (var child : children) {
             Game2D.getInstance().Destroy(child,Layers.L_UI);
         }
-        InputManager.keys.get(VK_ESCAPE).getOnKeyDown().RemoveListener(var -> this.Close());
+        InputManager.UnregisterOnKeyDown(VK_ESCAPE, var -> this.Close());
+        for (int i = 0; i < items.size(); i++){
+            int finalI = i;
+            InputManager.UnregisterOnKeyDown(VK_1 + i,(key) -> this.BuyItem(finalI));
+        }
     }
 
     public void BuyItem(int itemIndex){
@@ -59,11 +67,13 @@ public class ShopUI extends UIComponent{
         var _player = Game2D.getInstance().player();
         if (_player.coins > _item.price){
             _player.coins -= _item.price;
-            for (var stat : _item.statistics.keySet()) {
-                _player.statistics.put(stat, _player.statistics.get(stat) + _item.statistics.get(stat));
+            _player.ConsumeItem(_item);
+            for (int i = 0; i < items.size(); i++){
+                int finalI = i;
+                InputManager.UnregisterOnKeyDown(VK_1 + i,(key) -> this.BuyItem(finalI));
             }
+            items.remove(itemIndex);
+            Close();
         }
     }
-
-
 }

@@ -17,6 +17,5 @@ public class ItemUI extends UIComponent{
         var NameUI = new UILabel(item.name, new Rect(0,0,0,0), Vertex.zero, style);
         var DescriptionUI = new UILabel(item.description, new Rect(0,0,0,0), Vertex.zero, style);
         var PriceUI = new UILabel(item.price + "", new Rect(0,0,0,0), Vertex.zero, style);
-
     }
 }
