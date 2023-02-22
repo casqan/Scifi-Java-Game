@@ -34,7 +34,8 @@ public class Boss extends Entity {
         animations.get("DAMAGE").onAnimationEnd.AddListener((var) -> currentAction = EntityAction.IDLEPX);
         onDeath.AddListener((entity -> Game2D.getInstance().won()));
         onDeath.AddListener((entity -> Game2D.getInstance().Destroy(entity,Layers.L_ENTITIES)));
-        health = 500;
+        this.statistics = new Statistics();
+        statistics.put(Statistics.HEALTH, 500D);
     }
 
     @Override

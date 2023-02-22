@@ -238,15 +238,16 @@ public class Game2D implements Game{
         });
 
         player().onDamage.AddListener((player) -> {
-            if (player.health < 10) {
+            var _health = player.statistics.get(Statistics.HEALTH);
+            if (_health < 10) {
                 healthStyle.backgroundColor = Color.red;
-            } else if (player.health < 30) {
+            } else if (_health < 30) {
                 healthStyle.backgroundColor = Color.yellow;
             } else {
                 healthStyle.backgroundColor = Color.green;
             }
-            healthBar.rect.dimensions.x = (long) Math.ceil(player.statistics.get(Statistics.DAMAGE));
-            healthBarLabel.SetContent("HEALTH:" + player.statistics.get(Statistics.DAMAGE));
+            healthBar.rect.dimensions.x = (long) Math.ceil(_health);
+            healthBarLabel.SetContent("HEALTH:" + _health);
         });
 
         var coinsLabel = new UILabel(player.coins + " Coins",new Rect(-16,16,200,20),
@@ -409,6 +410,7 @@ public class Game2D implements Game{
         Merchant merchant = new Merchant(merchantAnimations,new Vertex(400,400),
                 new Vertex(48,76),32,16,new Vertex(0,0),2,EntityAction.IDLEPX);
         merchant.name = "merchant";
+        PREFABS.put("MERCHANT",merchant.Clone());
         Instantiate(Layers.L_ENTITIES,merchant);
         //endregion
 

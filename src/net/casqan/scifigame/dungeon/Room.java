@@ -5,9 +5,7 @@ import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.core.Event;
 import net.casqan.scifigame.core.Layers;
-import net.casqan.scifigame.entities.Boss;
-import net.casqan.scifigame.entities.Enemy;
-import net.casqan.scifigame.entities.Key;
+import net.casqan.scifigame.entities.*;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.extensions.VertexInt;
 import net.casqan.scifigame.tilesystem.*;
@@ -181,7 +179,7 @@ public class Room {
         if (type == null){
             if (doors.size() < 1 ){
                 type = RoomType.End;
-            }else if (Random().nextFloat() > .9f){
+            }else if (Random().nextFloat() > .1f){
                 type = RoomType.Merchant;
             }else {
                 type = RoomType.Normal;
@@ -208,11 +206,15 @@ public class Room {
                 Instantiate(Layers.L_UI,healthContainer);
                 Instantiate(Layers.L_UI,healthBar);
                 Instantiate(Layers.L_UI,healthBarText);
-                boss.onDamage.AddListener((b) -> healthBar.rect.dimensions.x = boss.health / 500f * 200);
+                boss.onDamage.AddListener((b) -> healthBar.rect.dimensions.x =
+                        boss.statistics.get(Statistics.HEALTH) / 500f * 200);
                 break;
             case End:
                 break;
             case Merchant:
+                var _merchant = ((Merchant) PREFABS.get("MERCHANT")).Clone();
+                _merchant.SetItems(getInstance().items.values());
+                Instantiate(Layers.L_ENTITIES, _merchant,Vertex.add(new Vertex(16*4*8,16*4*8),worldPos));
             case Start:
                 SpawnKeysInRoom();
                 break;
@@ -235,11 +237,9 @@ public class Room {
                 }
                 for (int i = 0; i < doors.size(); i++){
                     enemies.get(i).onDeath = new Event<>();
-                    enemies.get(i).onDeath.AddListener((var) -> {
-                        Instantiate(Layers.L_ENTITIES,
-                                new Key(getInstance().keyEntity,
-                                        Vertex.add(var.pos,var.anchor)));
-                    });
+                    enemies.get(i).onDeath.AddListener((var) -> Instantiate(Layers.L_ENTITIES,
+                            new Key(getInstance().keyEntity,
+                                    Vertex.add(var.pos,var.anchor))));
                 }
                 break;
             default:

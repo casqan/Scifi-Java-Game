@@ -2,6 +2,7 @@ package net.casqan.scifigame.entities;
 
 import name.panitz.game2d.Vertex;
 import net.casqan.scifigame.animations.Animation;
+import net.casqan.scifigame.animations.EntityAction;
 import net.casqan.scifigame.extensions.Rect;
 import net.casqan.scifigame.items.Item;
 import net.casqan.scifigame.ui.ShopUI;
@@ -29,7 +30,7 @@ public class Merchant extends Character{
 
     @Override
     public void Interact() {
-        System.out.printf("Interacting with merchant");
+        System.out.println("Interacting with merchant");
         if (shopUI != null && shopUI.isOpen) {
             shopUI.Close();
         }
@@ -47,6 +48,10 @@ public class Merchant extends Character{
 
     @Override
     public void DealDamage(int damage) {
-        return;
+    }
+
+    public Merchant Clone(){
+        return new Merchant(this.animations, new Vertex(this.pos.x,this.pos.y), this.anchor,
+                this.width, this.height,new Vertex(0,0),0, EntityAction.IDLEPX);
     }
 }
