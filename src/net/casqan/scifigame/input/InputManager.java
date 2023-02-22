@@ -1,5 +1,6 @@
 package net.casqan.scifigame.input;
 
+import net.casqan.scifigame.Game2D;
 import net.casqan.scifigame.core.Event;
 
 import java.util.HashMap;
@@ -19,12 +20,16 @@ public final class InputManager {
     }
     public static void UnregisterOnKeyDown(int key, Consumer<Integer> listener){
         if (!keys.containsKey(key)) return;
-        keys.get(key).getOnKeyDown().RemoveListener(listener);
+        Game2D.QueueOnMain(() -> {
+            keys.get(key).getOnKeyDown().RemoveListener(listener);
+        });
     }
 
     public static void UnregisterOnKeyUp(int key, Consumer<Integer> listener){
         if (!keys.containsKey(key)) return;
-        keys.get(key).getOnKeyUp().RemoveListener(listener);
+        Game2D.QueueOnMain(() -> {
+            keys.get(key).getOnKeyUp().RemoveListener(listener);
+        });
     }
 
     public static void SetPressed(int key,boolean pressed){

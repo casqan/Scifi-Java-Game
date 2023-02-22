@@ -9,13 +9,17 @@ import net.casqan.scifigame.items.Item;
 
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static java.awt.event.KeyEvent.*;
 
 public class ShopUI extends UIComponent{
     List<Item> items = new ArrayList<>();
     List<UIComponent> children = new ArrayList<>();
+    Consumer<Integer> closeFunc;
+    List<Consumer<Integer>> buyFuncs = new ArrayList<>();
     public boolean isOpen = false;
 
     public ShopUI(List<Item> items, Rect rect, Vertex anchor, UIStyle style) {
@@ -49,10 +53,18 @@ public class ShopUI extends UIComponent{
             //child.Show();
         }
         isOpen = true;
-        InputManager.RegisterOnKeyDown(VK_ESCAPE, (key) -> this.Close());
+        if (closeFunc == null) closeFunc = (key) -> this.Close();
+        InputManager.RegisterOnKeyDown(VK_ESCAPE,closeFunc);
+        if (buyFuncs.size() == 0 || items.size() != buyFuncs.size()){
+            buyFuncs.clear();
+            for (int i = 0; i < items.size(); i++){
+                int finalI = i;
+                buyFuncs.add(key -> this.BuyItem(finalI));
+            }
+        }
+
         for (int i = 0; i < items.size(); i++){
-            int finalI = i;
-            InputManager.RegisterOnKeyDown(VK_1 + i,(key) -> this.BuyItem(finalI));
+            InputManager.RegisterOnKeyDown(VK_1 + i,buyFuncs.get(i));
         }
     }
     public void Close(){
@@ -60,10 +72,11 @@ public class ShopUI extends UIComponent{
         for (var child : children) {
             Game2D.getInstance().Destroy(child,Layers.L_UI);
         }
-        InputManager.UnregisterOnKeyDown(VK_ESCAPE, var -> this.Close());
+        InputManager.UnregisterOnKeyDown(VK_ESCAPE, closeFunc);
         for (int i = 0; i < items.size(); i++){
             int finalI = i;
-            InputManager.UnregisterOnKeyDown(VK_1 + i,(key) -> this.BuyItem(finalI));
+            System.out.println("Removing purchasing Item on slot: " + finalI);
+            InputManager.UnregisterOnKeyDown(VK_1 + i,buyFuncs.get(i));
         }
     }
 
@@ -75,7 +88,8 @@ public class ShopUI extends UIComponent{
             _player.ConsumeItem(_item);
             for (int i = 0; i < items.size(); i++){
                 int finalI = i;
-                InputManager.UnregisterOnKeyDown(VK_1 + i,(key) -> this.BuyItem(finalI));
+                System.out.println("Removing purchasing Item on slot: " + finalI);
+                InputManager.UnregisterOnKeyDown(VK_1 + i,buyFuncs.get(i));
             }
             items.remove(itemIndex);
             Close();

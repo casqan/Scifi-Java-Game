@@ -29,9 +29,11 @@ import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
+import java.lang.reflect.Executable;
 import java.sql.SQLType;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 import static java.awt.event.KeyEvent.*;
@@ -49,6 +51,7 @@ public class Game2D implements Game{
     VertexInt screen;
     List<Pair<String,GameObj>> destroyQueue = new ArrayList<>();
     List<Pair<String,GameObj>> addQueue = new ArrayList<>();
+    static List<Runnable> mainThreadQueue = new ArrayList<>();
     public VertexInt getScreen() {
         return screen;
     }
@@ -528,9 +531,17 @@ public class Game2D implements Game{
             }
             addQueue.clear();
         }
+        if (mainThreadQueue.size() > 0){
+            mainThreadQueue.forEach((Runnable::run));
+            mainThreadQueue.clear();
+        }
         for (var key : goss().keySet())
             for (var go : goss().get(key))
                 go.Update();
+    }
+
+    public static void QueueOnMain(Runnable runnable){
+        mainThreadQueue.add(runnable);
     }
 
     @Override
