@@ -198,7 +198,7 @@ public class Game2D implements Game{
         _player.name = "player";
         _player.statistics.put(Statistics.HEALTH,200d);
         _player.keys = 0;
-        _player.coins = 200000;
+        _player.coins = 0;
         _player.statistics.put(Statistics.SPEED,2d);
         _player.statistics.put(Statistics.DAMAGE,10d);
         SetPlayer(_player);
