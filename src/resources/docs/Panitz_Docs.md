@@ -1,20 +1,22 @@
 # Dokumentation zum Projekt 
 
 ## Einleitung
-
 Bei dem Spiel handelt es sich um ein sogenanntes "Rogue-Like", basierend auf dem Spiel "Rogue" von 1980.
 Das Spiel ist ein Dungeon-Crawler, bei dem der Spieler durch einen Dungeon navigieren muss, 
-u m denBoss zu finden und zu besiegen. ~~Der Spieler bekommt coins, die er in einem Shop gegen Items eintauschen kann
-um seine eigenen Statistiken, wie z.B. Geschwindigkeit, Schaden, Leben, etc. zu verbessern.~~ (Das Kaufen von Upgrades
-wurde vorerst entfernt.)
-## Steuerung
+um den Boss, in diesem Fall ein Kristall, zu finden und zu besiegen. Der Spieler bekommt coins, die er in einem Shop 
+gegen Gegenstände eintauschen kann um seine eigenen Statistiken, wie z.B. Geschwindigkeit, 
+Schaden, Leben, etc. zu verbessern.
 
+## Steuerung
 Bewegung mit den Tasten: `W A S D`
 
 Angreifen mit: `Leertaste`
 
-~~Interagiern mit dem Händler: `E`~~
+Interagieren mit dem Händler: `E`
 
+Kaufen eines Items mit: `1`,`2`,`3`, ...
+
+Wechseln zwischen Fenster und Vollbild-Modus mit: `F11`
 ## Features
 Das Spielt besitzt eine sich zufällig generierende Spielwelt, Charactere mit dynamischer Animation (Anpassung an die
 Bewegungsrichtung), vollständig dynamisches UI, welches sich an den Bildschirm anpasst und ein Event-System. In

@@ -31,6 +31,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.InputStream;
 import java.lang.reflect.Executable;
 import java.sql.SQLType;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -574,12 +575,12 @@ public class Game2D implements Game{
         var winText = new UILabel("You Win!", new Rect(0,0,200,20),
                 new Vertex(0.5,0.5), winStyle);
         Instantiate(Layers.L_UI,winText);
-        var timeTaken = new UILabel(String.format("Your run took: %s0.3 seconds",GameTime.Time()), new Rect(0,50,200,20),
+        String time = new DecimalFormat("###################.##").format(GameTime.Time());
+        var timeTaken = new UILabel(
+                String.format("Your run took: %s seconds",time),
+                new Rect(0,50,200,20),
                 new Vertex(0.5,0.5), UIStyle.DEFAULT);
         Instantiate(Layers.L_UI,timeTaken);
-        var restartText = new UILabel("Press STRG and R to restart!", new Rect(0,-50,200,20),
-                new Vertex(0.5,0.5), UIStyle.DEFAULT);
-        Instantiate(Layers.L_UI,restartText);
         return true;
     }
 
@@ -598,12 +599,10 @@ public class Game2D implements Game{
         var winText = new UILabel("You Lost!", new Rect(0,0,200,20),
                 new Vertex(0.5,0.5), winStyle);
         Instantiate(Layers.L_UI,winText);
-        var timeTaken = new UILabel("Your run took: " + GameTime.Time() + " seconds", new Rect(0,50,200,20),
+        String time = new DecimalFormat("###################.##").format(GameTime.Time());
+        var timeTaken = new UILabel(String.format("Your run took: %s seconds",time), new Rect(0,50,200,20),
                 new Vertex(0.5,0.5), UIStyle.DEFAULT);
         Instantiate(Layers.L_UI,timeTaken);
-        var restartText = new UILabel("Press STRG and R to restart!", new Rect(0,-50,200,20),
-                new Vertex(0.5,0.5), UIStyle.DEFAULT);
-        Instantiate(Layers.L_UI,restartText);
         return true;
     }
 
