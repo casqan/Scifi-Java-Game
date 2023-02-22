@@ -179,7 +179,7 @@ public class Room {
         if (type == null){
             if (doors.size() < 1 ){
                 type = RoomType.End;
-            }else if (Random().nextFloat() > .1f){
+            }else if (Random().nextFloat() > .8f){
                 type = RoomType.Merchant;
             }else {
                 type = RoomType.Normal;
