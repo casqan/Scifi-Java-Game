@@ -117,19 +117,23 @@ public class Entity extends AbstractGameObj implements Cloneable{
     public void DealDamage(int damage){
         System.out.println("Dealing damage to entity!");
         if (dead) return;
-        health -= CalculateDamage(damage);
-        if (health < 0) health = 0;
+        var _nhealth = statistics.get(Statistics.HEALTH) - CalculateDamage(damage);
+        statistics.put(Statistics.HEALTH, _nhealth < 0 ? 0 : _nhealth);
+        var _health = statistics.get(Statistics.HEALTH);
         onDamage.Invoke(this);
-        if (health <= 0){
+        if (_health <= 0){
             onDeath.Invoke(this);
             Die();
         }
     }
 
-    //Damage formula: damage * e^(-0.1 * armor)
+    //Damage formula: damage * 1/((armor * 0.1 + 1))
+    //So 10 = 50% -> 20 = 33% -> 30 = 25% -> 40 = 20%
     int CalculateDamage(int damage){
+        assert damage > 0;
         if (statistics.getOrDefault(Statistics.ARMOR,0D)== 0) return damage;
-        return (int) (damage * Math.pow(Math.E,-0.1d * statistics.get(Statistics.ARMOR)));
+        var a = statistics.get(Statistics.ARMOR) * 0.1 + 1;
+        return (int) (damage * (1/(a)));
     }
 
     public void Die(){

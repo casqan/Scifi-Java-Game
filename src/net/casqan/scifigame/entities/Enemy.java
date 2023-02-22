@@ -22,7 +22,7 @@ public class Enemy extends Character{
     public Enemy(Enemy og, Vertex pos){
         super(og.animations, pos, og.anchor, og.width, og.height, og.velocity, og.speed, og.currentAction);
         this.maxHealth = og.maxHealth;
-        this.health = og.maxHealth;
+        this.statistics = (Statistics) og.statistics.clone();
         this.onDeath = new Event<>();
         onDeath.AddListener(entity -> Die());
         onDeath.AddListener(entity -> Game2D.getInstance().player()

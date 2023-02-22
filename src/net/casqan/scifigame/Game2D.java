@@ -193,7 +193,7 @@ public class Game2D implements Game{
                 new Vertex(112,132),32,16,new Vertex(0,0),1,EntityAction.IDLEPX);
         _player.onDeath.Clear();
         _player.name = "player";
-        _player.health = 200;
+        _player.statistics.put(Statistics.HEALTH,200d);
         _player.keys = 0;
         _player.coins = 200000;
         _player.statistics.put(Statistics.SPEED,2d);
@@ -211,8 +211,10 @@ public class Game2D implements Game{
         //region Player UI
         var healthStyle = new UIStyle();
         healthStyle.backgroundColor = Color.green;
-        var healthBar = new UIRectangle(new Rect(16,32,player.health,20),new Vertex(0,0),healthStyle);
-        var healthBarLabel = new UILabel("Health: " + player.health,new Rect(16,20,200,20),new Vertex(0,0),healthStyle);
+        var healthBar = new UIRectangle(new Rect(16,32,player.statistics.getOrDefault(Statistics.HEALTH,0D),
+                20),new Vertex(0,0),healthStyle);
+        var healthBarLabel = new UILabel("Health: " + player.statistics.getOrDefault(Statistics.HEALTH,0D),
+                new Rect(16,20,200,20),new Vertex(0,0),healthStyle);
 
         HashMap<String, UILabel> labels = new HashMap<>();
         labels.put(Statistics.HEALTH,healthBarLabel);
@@ -240,8 +242,8 @@ public class Game2D implements Game{
             } else {
                 healthStyle.backgroundColor = Color.green;
             }
-            healthBar.rect.dimensions.x = (int) (player.health);
-            healthBarLabel.SetContent("Health: " + player.health);
+            healthBar.rect.dimensions.x = (long) Math.ceil(player.statistics.get(Statistics.DAMAGE));
+            healthBarLabel.SetContent("HEALTH:" + player.statistics.get(Statistics.DAMAGE));
         });
 
         var coinsLabel = new UILabel(player.coins + " Coins",new Rect(-16,16,200,20),
@@ -376,7 +378,7 @@ public class Game2D implements Game{
 
         Enemy enemy = new Enemy(enemyAnimations,new Vertex(0,0),
                 new Vertex(112,132),32,16,new Vertex(0,0),1.5f,EntityAction.IDLEPX);
-        enemy.maxHealth = 20;
+        enemy.statistics.put(Statistics.HEALTH, 20D);
         PREFABS.put("enemy",enemy);
         //endregion
 
